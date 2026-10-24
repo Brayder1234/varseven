@@ -13,7 +13,7 @@
 .subnav { position: sticky; top: var(--nav); z-index: 40; margin-top: -42px; transition: top .45s var(--ease); }
 .nav-hide .subnav { top: 0; }
 .subnav .wrap { display: flex; justify-content: center; }
-.subnav nav { display: flex; gap: 2px; padding: 5px; overflow-x: auto; scrollbar-width: none; max-width: 100%; background: rgba(7, 11, 42, .9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 20px 40px -20px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--line-2); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.subnav nav { display: flex; gap: 2px; padding: 5px; overflow-x: auto; scrollbar-width: none; max-width: 100%; background: #0A0F33; box-shadow: 0 16px 30px -18px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--line-2); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
 .subnav nav::-webkit-scrollbar { display: none; }
 .subnav a { flex: none; padding: 10px 16px; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); transition: background .3s, color .3s; }
 .subnav a:hover { color: var(--text); }

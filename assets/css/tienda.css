@@ -7,7 +7,7 @@
 
 .toolbar { position: sticky; top: var(--nav); z-index: 30; display: grid; gap: 10px; padding: 14px 0; margin-bottom: 22px; transition: top .45s var(--ease); }
 .nav-hide .toolbar { top: 0; }
-.toolbar::before { content: ''; position: absolute; inset: 0 calc(50% - 50vw); z-index: -1; background: rgba(4, 5, 26, .92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); opacity: 0; transition: opacity .3s; }
+.toolbar::before { content: ''; position: absolute; inset: 0 calc(50% - 50vw); z-index: -1; background: #05061D; border-bottom: 1px solid var(--line); opacity: 0; transition: opacity .3s; }
 .toolbar.stuck::before { opacity: 1; }
 .tb-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; min-width: 0; }
 .tb-row > * { min-width: 0; }

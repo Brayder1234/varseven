@@ -69,6 +69,11 @@
       ${tag === 'button' ? '<span class="ver">Ver goles</span>' : ''}
     </${tag}>`;
   }
+  const centrar = (barra, el, suave) => {
+    if (!barra || !el) return;
+    const x = el.offsetLeft - (barra.clientWidth - el.offsetWidth) / 2;
+    barra.scrollTo({ left: Math.max(0, x), behavior: suave && !SP.reduce ? 'smooth' : 'instant' });
+  };
   const ordenHora = (a, b) => (a.dia || '').localeCompare(b.dia || '') || (a.hora || '').localeCompare(b.hora || '');
 
   function proximos() {
@@ -94,8 +99,7 @@
     const d = SP.descansa(T, fechaSel);
     $('#fecha-descansa').innerHTML = d.length ? `Descansa: <b>${d.map(e => esc(e.nombre)).join(', ')}</b>` : '';
     SP.revelar($('#resultados'));
-    const on = $('#fecha-chips [aria-pressed="true"]');
-    on?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' });
+    centrar($('#fecha-chips'), $('#fecha-chips [aria-pressed="true"]'), false);
   }
   $('#fecha-chips').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { fechaSel = +b.dataset.f; resultados(); } });
 
@@ -191,7 +195,7 @@
   const obs = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
     links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
-    $('#subnav a.on')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    centrar($('#subnav'), $('#subnav a.on'), true);
   }), { rootMargin: '-40% 0px -55% 0px' });
   links.forEach(a => { const s = document.getElementById(a.getAttribute('href').slice(1)); if (s) obs.observe(s); });
 })();

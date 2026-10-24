@@ -77,7 +77,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .topbar span { padding: 0 26px; white-space: nowrap; }
 .topbar span::before { content: '◆'; margin-right: 26px; color: var(--cyan); font-size: 9px; vertical-align: 1px; }
 @keyframes marquee { to { transform: translateX(-50%); } }
-.nav { position: sticky; top: 0; z-index: 60; padding-top: env(safe-area-inset-top); background: rgba(4, 5, 26, .82); -webkit-backdrop-filter: saturate(1.4) blur(16px); backdrop-filter: saturate(1.4) blur(16px); border-bottom: 1px solid var(--line); transition: transform .45s var(--ease); }
+.nav { position: sticky; top: 0; z-index: 60; padding-top: env(safe-area-inset-top); background: rgba(4, 5, 26, .96); border-bottom: 1px solid var(--line); transition: transform .45s var(--ease); }
 .nav-hide .nav { transform: translateY(-100%); }
 .nav-in { height: var(--nav); display: flex; align-items: center; gap: 24px; }
 .brand { display: flex; align-items: center; gap: 10px; flex: none; }
