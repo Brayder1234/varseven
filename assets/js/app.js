@@ -52,7 +52,8 @@ SP.ICON.whatsapp = SP.ICON.wa;
 SP.cargar = (nombre, alListo) => {
   const k = 'sp:' + nombre, cache = SP.store.get(k, null);
   let ultimo = cache ? JSON.stringify(cache) : '';
-  if (cache) alListo(cache, true);
+  // se pinta con la caché apenas termine de cargar el script de la página (así todo está declarado)
+  if (cache) queueMicrotask(() => alListo(cache, true));
   const red = fetch(`${SP.API}/api/${nombre}`, { cache: 'no-cache' })
     .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
     .catch(() => fetch(`data/${nombre}.json`).then(r => r.json()));
