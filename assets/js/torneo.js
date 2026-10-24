@@ -66,7 +66,7 @@
         <span class="cuando">${esc(SP.fecha(p.dia))}${fin && p.hora ? ' · ' + esc(SP.hora(p.hora)) : ''}${p.cancha ? ' · ' + esc(p.cancha) : ''}</span>
       </span>
       <span class="eq ${w === 'v' ? 'win' : ''}">${crest(p.visita)}<span>${nombre(p.visita)}</span></span>
-      ${tag === 'button' ? '<span class="ver">Ver goles</span>' : ''}
+      ${tag === 'button' ? `<span class="ver">${p.fotos ? 'Goles y fotos' : 'Ver goles'}</span>` : ''}
     </${tag}>`;
   }
   const centrar = (barra, el, suave) => {
@@ -133,6 +133,7 @@
         <div class="md-goles"><ul>${lista(p.local)}</ul><ul class="v">${lista(p.visita)}</ul></div>
         ${reg < total ? `<p class="md-nota">${total - reg} ${total - reg === 1 ? 'gol sin autor registrado' : 'goles sin autor registrado'}.</p>` : ''}
         ${p.mvp ? `<p class="md-mvp">⭐ Jugador del partido: ${esc(J[p.mvp]?.nombre || p.mvp)}</p>` : ''}
+        ${p.fotos ? `<a class="btn btn-light md-fotos" href="${esc(p.fotos)}" target="_blank" rel="noopener">📸 Fotos del partido ${ICON.ext}</a>` : ''}
       </div>`;
     md.hidden = false; SP.lock();
     history.pushState({ partido: id }, '', location.pathname + '#resultados');
@@ -169,8 +170,12 @@
   }
 
   // galería con visor
+  // jugadores del partido de la última fecha (las fotos completas de cada partido van por enlace de Drive)
   function galeria() {
     fotos = (T.fotos || []).filter(f => f.url);
+    const f = T.fotosFecha || SP.jugados(T).reduce((m, p) => Math.max(m, p.fecha), 0);
+    $('#jug-fecha').textContent = f ? `Fecha ${f}` : 'Última fecha';
+    $('#fotos').hidden = !fotos.length;
     $('#galeria').innerHTML = fotos.map((f, i) => `<button data-foto="${i}" class="r" style="--d:${(i % 4) * .05}s"><img src="${esc(f.url)}" alt="${esc(f.titulo || '')}" loading="lazy"><span>${esc(f.titulo || '')}</span></button>`).join('');
   }
   const lb = $('#lb');
