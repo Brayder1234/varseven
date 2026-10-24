@@ -49,12 +49,13 @@ SP.ICON.whatsapp = SP.ICON.wa;
 
 // ───────── datos: caché local → API → copia estática ─────────
 // cada nombre ('sitio' | 'torneo' | 'productos') se pinta enseguida con lo guardado y se refresca al llegar lo nuevo
+const pedidos = {}; // una sola petición por dato aunque varias partes de la página lo pidan
 SP.cargar = (nombre, alListo) => {
   const k = 'sp:' + nombre, cache = SP.store.get(k, null);
   let ultimo = cache ? JSON.stringify(cache) : '';
   // se pinta con la caché apenas termine de cargar el script de la página (así todo está declarado)
   if (cache) queueMicrotask(() => alListo(cache, true));
-  const red = fetch(`${SP.API}/api/${nombre}`, { cache: 'no-cache' })
+  const red = pedidos[nombre] ||= fetch(`${SP.API}/api/${nombre}`, { cache: 'no-cache' })
     .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
     .catch(() => fetch(`data/${nombre}.json`).then(r => r.json()));
   return red.then(d => {
