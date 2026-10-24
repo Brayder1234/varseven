@@ -75,7 +75,7 @@
 .insc-datos .ancho { grid-column: 1 / -1; }
 
 /* ───────── elige tu cancha ───────── */
-.canchas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.canchas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
 .cancha { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; padding: 24px; min-height: 480px; border-radius: 24px; color: var(--text);
   background: radial-gradient(80% 55% at 50% 34%, color-mix(in srgb, var(--g) 30%, transparent), transparent 72%), linear-gradient(180deg, #13206A, var(--n850) 60%, var(--n900)); box-shadow: 0 30px 60px -36px rgba(10, 20, 90, .8); transition: transform .6s var(--ease), box-shadow .6s; }
 .cancha:hover { transform: translateY(-8px); box-shadow: 0 40px 70px -34px color-mix(in srgb, var(--g) 70%, transparent); }

@@ -33,6 +33,19 @@
 .paso p { color: var(--muted); font-size: 14px; margin-top: 4px; }
 .paso:not(:last-child)::after { content: ''; position: absolute; top: 26px; left: calc(50% + 40px); right: calc(-50% + 40px); height: 2px; background: linear-gradient(90deg, var(--blue-2), transparent); }
 
+/* embajadores */
+.emb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.emb { position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 22px; overflow: hidden; background: var(--n800); box-shadow: inset 0 0 0 1px var(--line); isolation: isolate; }
+.emb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: transform 1s var(--ease); }
+.emb:hover img { transform: scale(1.05); }
+.emb::after { content: ''; position: absolute; inset: 40% 0 0; z-index: -1; background: linear-gradient(transparent, rgba(4, 5, 26, .92)); }
+.emb-txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px; display: flex; flex-direction: column; gap: 2px; }
+.emb-txt q { font-size: 14px; color: rgba(255, 255, 255, .85); margin-bottom: 8px; line-height: 1.4; }
+.emb-txt b { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 26px; text-transform: uppercase; line-height: 1; }
+.emb-txt small { font-family: var(--tech); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+.emb-txt em { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-style: normal; font-size: 13px; color: var(--muted); }
+.emb-txt em svg { width: 14px; height: 14px; fill: currentColor; }
+
 /* ───────── ficha de producto ───────── */
 .pd { padding: 30px 0 80px; }
 .pd-crumbs { font-family: var(--tech); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; }
@@ -88,7 +101,7 @@
 .pd-notas { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
 .pd-notas li { display: flex; gap: 10px; align-items: center; }
 .pd-notas .i { color: var(--cyan); width: 18px; height: 18px; }
-.specs { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 22px; border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.specs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin-top: 22px; border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
 .specs div { padding: 12px 14px; border-left: 1px solid var(--line); }
 .specs div:first-child { border-left: 0; }
 .specs small { display: block; font-family: var(--tech); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
@@ -112,6 +125,9 @@
   .paso::after { display: none; }
 }
 @media (max-width: 760px) {
+  .emb-grid { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 72%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 calc(var(--gut) * -1); padding: 2px var(--gut) 10px; }
+  .emb-grid::-webkit-scrollbar { display: none; }
+  .emb { scroll-snap-align: start; }
   .toolbar { padding: 10px 0; gap: 8px; }
   .search { max-width: none; flex-basis: 100%; }
   .tb-row > .tabs { flex: 1 1 100%; }
@@ -120,7 +136,6 @@
   .pd { padding-top: 16px; }
   .pd-stage { border-radius: 20px; margin: 0 calc(var(--gut) * -1); border-radius: 0; }
   .pd-actions { position: sticky; bottom: 0; z-index: 5; margin: 20px calc(var(--gut) * -1) 0; padding: 12px var(--gut) max(12px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(4, 5, 26, 0), var(--n950) 24%); }
-  .specs { grid-template-columns: 1fr 1fr 1fr; }
   .specs div { padding: 10px; }
   .colores button { width: 56px; height: 56px; }
 }

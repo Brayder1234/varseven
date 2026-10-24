@@ -108,7 +108,7 @@
     productos = ps;
     secciones();
     const cuenta = {}; ps.forEach(p => { cuenta[p.cat] = (cuenta[p.cat] || 0) + 1; });
-    $$('[data-cuenta]').forEach(el => { el.textContent = `${cuenta[el.dataset.cuenta] || 0} modelos`; });
+    $$('[data-cuenta]').forEach(el => { const n = cuenta[el.dataset.cuenta] || 0; el.textContent = `${n} ${n === 1 ? 'modelo' : 'modelos'}`; el.closest('.cancha').hidden = !n; });
     // un modelo por cancha (primero los destacados) y uno más
     const orden = [...ps.filter(p => p.destacado), ...ps.filter(p => !p.destacado)].filter(p => p.colores?.[0]?.foto);
     const vitrina = [];

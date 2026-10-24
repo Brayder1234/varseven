@@ -46,7 +46,7 @@
         <h1 class="display">${esc(P.nombre)}</h1>
         <div class="pd-price"><b>${fmt(precio)}</b>${SP.rebaja(precio, antes) ? `<s>${fmt(antes)}</s><em>-${SP.rebaja(precio, antes)}%</em>` : ''}</div>
         ${P.desc ? `<p class="pd-desc">${esc(P.desc)}</p>` : ''}
-        <div class="specs"><div><small>Superficie</small><b>${esc(cat.sup || '')}</b></div><div><small>Suela</small><b>${esc(cat.code || '')}</b></div><div><small>Colores</small><b>${P.colores.length}</b></div></div>
+        <div class="specs">${[['Superficie', cat.sup], ['Suela', cat.code], ['Colores', P.colores.length]].filter(x => x[1]).map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>
         ${P.colores.length > 1 ? `<div class="pd-block"><h3>Color <b>${esc(color.nombre || '')}</b></h3><div class="colores" id="colores">${P.colores.map(c => `<button style="--c:${esc(c.hex?.[0] || '#888')}" data-c="${esc(c.id)}" aria-pressed="${c.id === color.id}" aria-label="Color ${esc(c.nombre)}"><img src="${esc(c.foto || SP.img(c.fotos?.[0], 160))}" alt="" loading="lazy"></button>`).join('')}</div></div>` : ''}
         <div class="pd-block" id="bloque-talla"><h3>Talla <a href="#" id="ver-guia">Guía de tallas</a></h3>
           <div class="tallas" id="tallas">${tallas.map((t, i) => `<button class="talla" data-t="${i}" ${t.ok ? '' : 'disabled'} aria-pressed="${talla === t.col}" aria-label="Talla ${esc(t.col)} COL${t.ok ? '' : ', agotada'}"><b>${esc(t.col)}</b><small>${t.eur ? `EU ${esc(t.eur)}` : ''}${t.us ? ` · US ${esc(t.us)}` : ''}</small></button>`).join('')}</div>

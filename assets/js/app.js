@@ -230,6 +230,7 @@ SP.alSitio = [];
 SP.cargar('sitio', s => {
   if (!s) return;
   SP.sitio = s;
+  for (const c of s.categorias || []) SP.CATS[c.id] = { nombre: c.nombre, code: c.codigo || '', sup: c.superficie || '' };
   const av = (s.avisos || []).filter(Boolean);
   $('#topbar').innerHTML = [...av, ...av, ...av, ...av].map(a => `<span>${SP.esc(a)}</span>`).join('');
   const gen = s.tienda?.enlace || SP.wa(s.tienda?.whatsapp, `Hola ${s.tienda?.nombre || 'VAR'} 👋`);

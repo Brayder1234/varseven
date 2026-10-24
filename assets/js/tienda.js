@@ -15,7 +15,17 @@
   SP.cargar('sitio', s => {
     if (s?.categorias?.length) CATS = s.categorias.map(c => ({ id: c.id, nombre: c.nombre, code: c.codigo, sup: c.superficie }));
     pintarTabs();
+    embajadores(s?.embajadores);
   });
+  function embajadores(lista) {
+    const l = (lista || []).filter(x => x.visible !== false && x.foto);
+    $('#embajadores').hidden = !l.length;
+    $('#emb-grid').innerHTML = l.map((x, i) => `<${x.url ? `a href="${esc(x.url)}" target="_blank" rel="noopener"` : 'div'} class="emb r" style="--d:${(i % 4) * .07}s">
+      <img src="${esc(x.foto)}" alt="${esc(x.nombre)}" loading="lazy">
+      <span class="emb-txt">${x.frase ? `<q>${esc(x.frase)}</q>` : ''}<b>${esc(x.nombre)}</b>${x.rol ? `<small>${esc(x.rol)}</small>` : ''}${x.usuario ? `<em>${SP.ICON.instagram}${esc(x.usuario)}</em>` : ''}</span>
+    </${x.url ? 'a' : 'div'}>`).join('');
+    SP.revelar($('#embajadores'));
+  }
   SP.cargar('productos', ps => {
     if (!ps) { $('#grid').innerHTML = '<p class="empty">No pudimos cargar los productos. Revisa tu conexión.</p>'; return; }
     P = ps; pintarTabs(); pintar(true);
@@ -24,9 +34,11 @@
 
   function pintarTabs() {
     const n = c => P.filter(p => c === 'todos' || p.cat === c).length;
-    $('#tabs').innerHTML = '<span class="tabs-pill"></span>' + [{ id: 'todos', nombre: 'Todos' }, ...CATS]
+    // una categoría sin productos todavía no se muestra
+    const visibles = P.length ? CATS.filter(c => n(c.id) || st.cat === c.id) : CATS;
+    $('#tabs').innerHTML = '<span class="tabs-pill"></span>' + [{ id: 'todos', nombre: 'Todos' }, ...visibles]
       .map(c => `<button role="tab" data-cat="${esc(c.id)}" aria-selected="${st.cat === c.id}">${esc(c.nombre)}${P.length ? `<sup>${n(c.id)}</sup>` : ''}</button>`).join('');
-    $('#hero-cats').innerHTML = CATS.map(c => `<a href="?cat=${esc(c.id)}">${esc(c.nombre)} <b>${esc(c.code || '')}</b></a>`).join('');
+    $('#hero-cats').innerHTML = visibles.map(c => `<a href="?cat=${esc(c.id)}">${esc(c.nombre)} <b>${esc(c.code || '')}</b></a>`).join('');
     requestAnimationFrame(() => SP.pildora($('#tabs')));
   }
 

@@ -33,6 +33,7 @@ h1, h2, h3, h4, p { margin: 0; }
 :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 8px; }
 ::selection { background: var(--cyan); color: var(--n950); }
 .i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+[hidden] { display: none !important; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 max(var(--gut), env(safe-area-inset-right)) 0 max(var(--gut), env(safe-area-inset-left)); }
 .off, .off *, .off *::before, .off *::after { animation-play-state: paused !important; }
