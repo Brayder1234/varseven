@@ -115,8 +115,9 @@
   .door-tienda { clip-path: polygon(0 7vw, 100% 0, 100% 100%, 0 100%); margin: 0; padding: calc(7vw + 26px) var(--gut) 40px; }
   .door-tienda .door-logo { top: calc(7vw + 20px); }
   .door h2 { font-size: clamp(60px, 18vw, 96px); }
-  .door-shoes { top: auto; bottom: 30%; width: 74%; right: -2%; }
-  .door-tienda .door-logo { height: 70px; }
+  /* en celular el guayo va en su propio espacio, encima del título (no flotando sobre el texto) */
+  .door-shoes { position: relative; inset: auto; width: min(100%, 420px); margin: 64px auto 8px; flex: none; }
+  .door-tienda .door-logo { height: 62px; top: calc(7vw + 16px); }
   .split-vs { display: none; }
   .benef-grid { grid-template-columns: 1fr; }
   .insc-datos b { font-size: 19px; }

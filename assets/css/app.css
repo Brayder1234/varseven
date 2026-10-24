@@ -20,7 +20,10 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: calc(var(--nav) + 70px); }
+html { overflow-x: clip; }
 body { margin: 0; background: var(--n950); color: var(--text); font-family: var(--body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+/* nada se sale de lado (en iPhone eso deja mover la página horizontalmente); clip no rompe las barras fijas */
+main, .foot { overflow-x: clip; }
 body.lock { position: fixed; left: 0; right: 0; overflow: hidden; }
 img { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -221,7 +224,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .wa-float { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 45; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: var(--wa); color: #fff; box-shadow: 0 14px 30px -10px rgba(37, 211, 102, .7); transition: transform .5s var(--spring); }
 .wa-float svg { width: 28px; height: 28px; fill: currentColor; }
 .wa-float::before { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--wa); animation: ping 3.2s var(--ease) infinite; }
-@keyframes ping { 0% { transform: scale(1); opacity: .7; } 60%, 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes ping { 0% { transform: scale(1); opacity: .7; } 60%, 100% { transform: scale(1.45); opacity: 0; } }
 .modal-open .wa-float { transform: scale(0); }
 
 /* bolsa */
