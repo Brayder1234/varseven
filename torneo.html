@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es-CO" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Torneo · Seven Pro League F7 Makro</title>
+<meta name="description" content="Tabla de posiciones, próximos partidos, resultados por fecha, goleadores, sanciones y fotos de la Seven Pro League. Inscripciones a la Seven Pro Cup 2026.">
+<meta name="theme-color" content="#04051A">
+<meta property="og:title" content="Seven Pro League F7 Makro · Torneo">
+<meta property="og:image" content="assets/img/torneo/pag-01.webp">
+<link rel="icon" type="image/png" href="assets/img/logos/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/logos/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://sevenpro-api.sarmientobrayder10.workers.dev" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/torneo.css">
+<script>document.documentElement.classList.replace('no-js', 'js')</script>
+</head>
+<body data-page="torneo">
+<main>
+  <section class="page-hero t-hero">
+    <span class="hero-ghost display" aria-hidden="true">F7</span>
+    <div class="wrap t-hero-in">
+      <img class="t-hero-logo" src="assets/img/logos/seven-pro-league.png" alt="Seven Pro League">
+      <div>
+        <p class="crumbs"><a href="index.html">Inicio</a> / Torneo</p>
+        <h1 class="display h1" id="t-nombre">Seven Pro <span class="accent">League</span></h1>
+        <p class="lead" id="t-temporada">Fútbol 7 · Cancha Makro</p>
+        <div class="t-stats" id="t-stats"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="subnav"><div class="wrap"><nav id="subnav" aria-label="Secciones del torneo">
+    <a href="#inscripcion">Inscripción</a><a href="#posiciones">Posiciones</a><a href="#partidos">Próximos</a><a href="#resultados">Resultados</a><a href="#goleadores">Goleadores</a><a href="#sanciones">Sanciones</a><a href="#fotos">Fotos</a><a href="#redes">Redes</a>
+  </nav></div></div>
+
+  <!-- inscripción: apartado propio, separado de las estadísticas -->
+  <section class="sec" id="inscripcion">
+    <div class="wrap"><div id="ins"><div class="sk" style="height:460px"></div></div></div>
+  </section>
+
+  <section class="sec sec-light cut-top" id="posiciones">
+    <div class="wrap">
+      <div class="head">
+        <div class="r"><p class="eyebrow" id="pos-fase">Fase de grupos</p><h2 class="display h2">Tabla de <span style="color:var(--blue)">posiciones</span></h2></div>
+        <p class="lead r" id="pos-nota">Se actualiza sola con cada resultado.</p>
+      </div>
+      <div class="tabla-wrap r"><table class="tabla" id="tabla"><thead><tr><th>#</th><th>Equipo</th><th>PTS</th><th>PJ</th><th class="ocultar">PG</th><th class="ocultar">PE</th><th class="ocultar">PP</th><th>GF</th><th>GC</th><th>DIF</th><th class="ocultar">Últimos</th></tr></thead><tbody></tbody></table></div>
+      <div class="leyenda" id="leyenda"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="partidos">
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow" id="prox-sub">Próxima fecha</p><h2 class="display h2">Próximos <span class="grad">partidos</span></h2></div></div>
+      <div id="proximos"><div class="sk" style="height:240px"></div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="resultados" style="padding-top:0">
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow">Fecha por fecha</p><h2 class="display h2">Resultados</h2></div>
+        <p class="lead r">Toca un partido para ver quién marcó.</p></div>
+      <div class="fecha-chips" id="fecha-chips" role="group" aria-label="Fecha"></div>
+      <div class="fecha-stats" id="fecha-stats"></div>
+      <div class="partidos" id="fecha-partidos"></div>
+      <p class="descanso" id="fecha-descansa"></p>
+    </div>
+  </section>
+
+  <section class="sec sec-light cut-top" id="goleadores">
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow">Ranking</p><h2 class="display h2">Gole<span style="color:var(--blue)">adores</span></h2></div>
+        <p class="lead r">Se suman solos con los goles de cada resultado.</p></div>
+      <div class="podio" id="podio"></div>
+      <div class="gol-lista" id="gol-lista"></div>
+      <div class="mas" id="gol-mas"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="sanciones">
+    <div class="wrap"><div id="sanc"></div></div>
+  </section>
+
+  <section class="sec" id="fotos" style="padding-top:0">
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow">Galería</p><h2 class="display h2">Fotos de <span class="grad">los partidos</span></h2></div></div>
+      <div class="galeria" id="galeria"></div>
+    </div>
+  </section>
+
+  <section class="sec sec-blue cut-top" id="redes">
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow" style="color:var(--cyan-2)">Redes del torneo</p><h2 class="display h2">Síguenos</h2></div></div>
+      <div class="socials r" id="socials"></div>
+      <div class="head" style="margin:60px 0 26px"><div class="r"><p class="eyebrow" style="color:var(--cyan-2)">Aliados</p><h3 class="display h3">Patrocinadores</h3></div></div>
+      <div class="sponsors" id="sponsors"></div>
+    </div>
+  </section>
+</main>
+
+<div class="md" id="md" role="dialog" aria-modal="true" aria-label="Detalle del partido" hidden>
+  <div class="md-scrim" data-close></div>
+  <div class="md-panel" id="md-panel"></div>
+</div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Foto" hidden>
+  <div class="lb-img"><img id="lb-img" alt=""></div>
+  <p class="lb-cap" id="lb-cap"></p>
+  <button class="icon-btn lb-close" data-lb="cerrar" aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <button class="icon-btn lb-prev" data-lb="-1" aria-label="Anterior"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+  <button class="icon-btn lb-next" data-lb="1" aria-label="Siguiente"><svg class="i" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+</div>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/torneo.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+// Tienda: catálogo con filtros guardados en la URL (al volver de un producto se conserva todo)
+'use strict';
+(() => {
+  const { $, $$, esc } = SP;
+  const POR_PAGINA = 24;
+  const qs = new URLSearchParams(location.search);
+  const st = { cat: qs.get('cat') || 'todos', marca: qs.get('marca') || 'todas', q: qs.get('q') || '', nino: qs.get('nino') === '1', orden: qs.get('orden') || 'nuevo' };
+  const claveVista = 'sp:vista:' + location.search;
+  let mostrar = +sessionStorage.getItem(claveVista) || POR_PAGINA;
+  let P = [], CATS = Object.entries(SP.CATS).map(([id, c]) => ({ id, ...c }));
+  const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  $('#q').value = st.q; $('#nino').checked = st.nino; $('#orden').value = st.orden;
+
+  SP.cargar('sitio', s => {
+    if (s?.categorias?.length) CATS = s.categorias.map(c => ({ id: c.id, nombre: c.nombre, code: c.codigo, sup: c.superficie }));
+    pintarTabs();
+  });
+  SP.cargar('productos', ps => {
+    if (!ps) { $('#grid').innerHTML = '<p class="empty">No pudimos cargar los productos. Revisa tu conexión.</p>'; return; }
+    P = ps; pintarTabs(); pintar(true);
+  });
+  if (!P.length) $('#grid').innerHTML = Array.from({ length: 8 }, () => '<div class="sk" style="aspect-ratio:1/1.25"></div>').join('');
+
+  function pintarTabs() {
+    const n = c => P.filter(p => c === 'todos' || p.cat === c).length;
+    $('#tabs').innerHTML = '<span class="tabs-pill"></span>' + [{ id: 'todos', nombre: 'Todos' }, ...CATS]
+      .map(c => `<button role="tab" data-cat="${esc(c.id)}" aria-selected="${st.cat === c.id}">${esc(c.nombre)}${P.length ? `<sup>${n(c.id)}</sup>` : ''}</button>`).join('');
+    $('#hero-cats').innerHTML = CATS.map(c => `<a href="?cat=${esc(c.id)}">${esc(c.nombre)} <b>${esc(c.code || '')}</b></a>`).join('');
+    requestAnimationFrame(() => SP.pildora($('#tabs')));
+  }
+
+  function filtrados() {
+    const q = norm(st.q).split(/\s+/).filter(Boolean);
+    let l = P.filter(p => (st.cat === 'todos' || p.cat === st.cat) && (st.marca === 'todas' || p.marca === st.marca) && (!st.nino || p.nino)
+      && q.every(w => norm(`${p.marca} ${p.nombre} ${SP.CATS[p.cat]?.nombre} ${(p.colores || []).map(c => c.nombre).join(' ')}`).includes(w)));
+    if (st.orden === 'asc') l = [...l].sort((a, b) => a.precio - b.precio);
+    else if (st.orden === 'desc') l = [...l].sort((a, b) => b.precio - a.precio);
+    else if (st.orden === 'az') l = [...l].sort((a, b) => `${a.marca} ${a.nombre}`.localeCompare(`${b.marca} ${b.nombre}`));
+    return l;
+  }
+
+  function pintar(inicial = false) {
+    // marcas disponibles en la categoría actual
+    const base = P.filter(p => st.cat === 'todos' || p.cat === st.cat);
+    const marcas = [...new Set(base.map(p => p.marca))].sort((a, b) => base.filter(p => p.marca === b).length - base.filter(p => p.marca === a).length);
+    if (st.marca !== 'todas' && !marcas.includes(st.marca)) st.marca = 'todas';
+    $('#marcas').innerHTML = [['todas', 'Todas las marcas'], ...marcas.map(m => [m, m])].map(([k, t]) => `<button class="chip" data-marca="${esc(k)}" aria-pressed="${st.marca === k}">${esc(t)}</button>`).join('');
+    $$('#tabs [data-cat]').forEach(b => b.setAttribute('aria-selected', b.dataset.cat === st.cat));
+    SP.pildora($('#tabs'));
+
+    const l = filtrados();
+    $('#count').innerHTML = `<b>${l.length}</b> ${l.length === 1 ? 'modelo' : 'modelos'}${st.q ? ` para “${esc(st.q)}”` : ''}`;
+    $('#grid').innerHTML = l.length ? l.slice(0, mostrar).map(SP.tarjeta).join('')
+      : `<div class="empty" style="grid-column:1/-1">No encontramos modelos con esos filtros.<br><br><button class="btn btn-ghost btn-sm" id="limpiar">Quitar filtros</button></div>`;
+    $('#ver-mas').innerHTML = l.length > mostrar ? `<span>Viendo ${Math.min(mostrar, l.length)} de ${l.length}</span><button class="btn btn-blue" id="mas">Ver más modelos</button>` : '';
+    SP.revelar($('#grid'));
+    if (inicial) {
+      // al volver de un producto: restaurar la posición
+      const y = +sessionStorage.getItem(claveVista + ':y');
+      if (y) requestAnimationFrame(() => scrollTo({ top: y, behavior: 'instant' }));
+    }
+  }
+
+  function aplicar(patch, irArriba = true) {
+    Object.assign(st, patch);
+    mostrar = POR_PAGINA;
+    const u = new URLSearchParams();
+    if (st.cat !== 'todos') u.set('cat', st.cat);
+    if (st.marca !== 'todas') u.set('marca', st.marca);
+    if (st.q) u.set('q', st.q);
+    if (st.nino) u.set('nino', '1');
+    if (st.orden !== 'nuevo') u.set('orden', st.orden);
+    history.replaceState(null, '', location.pathname + (u.toString() ? '?' + u : ''));
+    pintar();
+    if (irArriba) { const t = $('#catalogo').getBoundingClientRect().top + scrollY - 60; if (scrollY > t) scrollTo({ top: t, behavior: 'smooth' }); }
+  }
+
+  $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) aplicar({ cat: b.dataset.cat }); });
+  $('#marcas').addEventListener('click', e => { const b = e.target.closest('[data-marca]'); if (b) aplicar({ marca: b.dataset.marca }, false); });
+  $('#nino').addEventListener('change', e => aplicar({ nino: e.target.checked }, false));
+  $('#orden').addEventListener('change', e => aplicar({ orden: e.target.value }, false));
+  let tq; $('#q').addEventListener('input', e => { clearTimeout(tq); tq = setTimeout(() => aplicar({ q: e.target.value.trim() }, false), 220); });
+  document.addEventListener('click', e => {
+    if (e.target.closest('#mas')) { mostrar += POR_PAGINA; pintar(); }
+    if (e.target.closest('#limpiar')) { $('#q').value = ''; $('#nino').checked = false; aplicar({ cat: 'todos', marca: 'todas', q: '', nino: false }); }
+    if (e.target.closest('.pcard-hit')) { sessionStorage.setItem('sp:vista:' + location.search, mostrar); sessionStorage.setItem('sp:vista:' + location.search + ':y', scrollY); }
+  });
+
+  // barra de filtros con fondo cuando queda fija
+  const tb = $('#toolbar');
+  addEventListener('scroll', () => tb.classList.toggle('stuck', tb.getBoundingClientRect().top <= ($('#nav').getBoundingClientRect().bottom + 2)), { passive: true });
+})();

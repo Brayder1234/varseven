@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es-CO" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía del jugador · Suela y talla · VAR Tienda Deportiva</title>
+<meta name="description" content="¿FG, AG, TF o IC? Descubre qué suela agarra mejor en tu cancha y calcula tu talla exacta en COL, EUR y USA.">
+<meta name="theme-color" content="#04051A">
+<link rel="icon" type="image/png" href="assets/img/logos/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/logos/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/guia.css">
+<script>document.documentElement.classList.replace('no-js', 'js')</script>
+</head>
+<body data-page="guia">
+<main>
+  <section class="page-hero">
+    <span class="hero-ghost display" aria-hidden="true">TF</span>
+    <div class="wrap">
+      <p class="crumbs"><a href="index.html">Inicio</a> / Guía del jugador</p>
+      <h1 class="display h1">Guía del <span class="accent">jugador.</span></h1>
+      <p class="lead">Antes de comprar: qué suela agarra mejor en tu cancha y cuál es tu talla exacta en cada sistema.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">
+        <a class="btn btn-light" href="#superficies">Superficies</a><a class="btn btn-ghost" href="#tallas">Tallas</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec-blue" id="superficies" style="margin-top:-5vw;padding-top:calc(clamp(72px,9vw,128px) + 5vw)">
+    <div class="wrap" style="position:relative">
+      <div class="head"><div class="r"><p class="eyebrow" style="color:var(--cyan-2)">01 · Superficies</p><h2 class="display h2">¿En qué cancha <span class="accent">juegas?</span></h2></div>
+        <p class="lead r" style="color:rgba(255,255,255,.82)">Cada suela está hecha para un terreno. Usar la equivocada resbala, cansa y gasta los tacos antes de tiempo.</p></div>
+      <div class="sup-tabs r"><div class="tabs" role="tablist" aria-label="Superficie" id="sup-tabs"><span class="tabs-pill"></span></div></div>
+      <div class="sup" id="sup"></div>
+    </div>
+  </section>
+
+  <section class="sec sec-light" id="tallas">
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow">02 · Guía de tallas</p><h2 class="display h2">Tu talla, <span style="color:var(--blue)">sin adivinar.</span></h2></div>
+        <p class="lead r">Mide tu pie del talón a la punta del dedo más largo y mueve el control: te decimos tu talla en cada sistema.</p></div>
+      <div class="calc r">
+        <div class="pie">
+          <svg viewBox="0 0 120 260" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true" id="pie-svg"><path d="M60 250c-26 0-40-20-40-58 0-30 6-52 4-80-2-24 6-48 20-58 10-7 26-6 34 4 10 12 14 34 12 60-2 26 8 46 10 74 2 34-14 58-40 58z"/><circle cx="34" cy="22" r="9"/><circle cx="54" cy="14" r="8"/><circle cx="72" cy="16" r="7"/><circle cx="86" cy="24" r="6"/><circle cx="96" cy="36" r="5"/><path d="M110 8v244" stroke-dasharray="6 6"/><path d="M104 8h12M104 252h12"/></svg>
+          <p class="pie-cm display" id="cm-txt">26,5<small>cm</small></p>
+        </div>
+        <div>
+          <label for="cm">Largo de tu pie</label>
+          <input type="range" id="cm" min="22.5" max="30" step="0.1" value="26.5">
+          <div class="rango"><span>22,5 cm</span><span>30 cm</span></div>
+          <div class="res" id="res"></div>
+          <div class="ancho">Tu pie es <span class="seg" id="ancho"><button aria-pressed="true" data-a="0">Normal</button><button aria-pressed="false" data-a="1">Ancho</button></span></div>
+          <p class="consejo" id="consejo"></p>
+          <a class="btn btn-blue" style="margin-top:20px" id="ir-tienda" href="tienda.html">Ver guayos en mi talla <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+      <div class="como">
+        <div class="r"><b>01</b><h4>Al final del día</h4><p>El pie se hincha con la actividad: mídelo en la tarde o después de entrenar.</p></div>
+        <div class="r" style="--d:.08s"><b>02</b><h4>Con la media puesta</h4><p>Párate sobre una hoja contra la pared, marca la punta del dedo más largo y mide.</p></div>
+        <div class="r" style="--d:.16s"><b>03</b><h4>¿Entre dos tallas?</h4><p>Elige la mayor. Si dudas, escríbenos y te asesoramos según el modelo.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/tallas.js"></script>
+<script src="assets/js/guia.js"></script>
+</body>
+</html>

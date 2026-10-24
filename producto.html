@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es-CO" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Producto · VAR Tienda Deportiva</title>
+<meta name="description" content="Elige color y talla, y pide por WhatsApp.">
+<meta name="theme-color" content="#04051A">
+<link rel="icon" type="image/png" href="assets/img/logos/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/logos/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://sevenpro-api.sarmientobrayder10.workers.dev" crossorigin>
+<link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/tienda.css">
+<script>document.documentElement.classList.replace('no-js', 'js')</script>
+</head>
+<body data-page="tienda">
+<main>
+  <section class="pd">
+    <div class="wrap">
+      <p class="pd-crumbs" id="crumbs"><a href="index.html">Inicio</a> / <a href="tienda.html">Tienda</a></p>
+      <div class="pd-grid" id="pd">
+        <div class="pd-gal"><div class="pd-stage sk"></div></div>
+        <div class="pd-info"><div class="sk" style="height:60px;width:60%"></div><div class="sk" style="height:220px;margin-top:20px"></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:20px" id="relacionados-sec" hidden>
+    <div class="wrap">
+      <div class="head"><div><p class="eyebrow">Para tu misma cancha</p><h2 class="display h2">También te puede <span class="grad">gustar</span></h2></div><a class="link" id="rel-link" href="tienda.html">Ver todos <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+      <div class="pgrid" id="relacionados"></div>
+    </div>
+  </section>
+</main>
+<div class="gt" id="gt" role="dialog" aria-modal="true" aria-label="Guía de tallas" hidden>
+  <div class="gt-scrim" data-gt></div>
+  <div class="gt-panel">
+    <button class="icon-btn" data-gt aria-label="Cerrar" style="position:absolute;top:14px;right:14px"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h3 class="display h3">Guía de tallas</h3>
+    <p style="color:var(--muted);margin-top:6px;font-size:14px">Mide tu pie del talón a la punta del dedo más largo.</p>
+    <table><thead><tr><th>Pie (cm)</th><th>COL</th><th>EUR</th><th>USA</th></tr></thead><tbody id="gt-body"></tbody></table>
+    <a class="link" href="guia.html#tallas" style="margin-top:16px">Calcular mi talla exacta <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</div>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/tallas.js"></script>
+<script src="assets/js/producto.js"></script>
+</body>
+</html>

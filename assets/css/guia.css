@@ -1,0 +1,63 @@
+/* Guía del jugador: superficies y calculadora de talla */
+
+.sup { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(26px, 5vw, 70px); align-items: center; margin-top: 30px; }
+.sup-vis { position: relative; aspect-ratio: 1; display: grid; place-items: center; }
+.sup-vis::before { content: ''; position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(closest-side, rgba(63, 224, 240, .28), transparent 72%); }
+.sup-vis::after { content: ''; position: absolute; inset: 14%; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, .2); animation: gira 60s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.sup-vis img { position: relative; z-index: 1; width: 92%; transform: rotate(-24deg); filter: drop-shadow(0 30px 30px rgba(0, 0, 0, .45)); animation: entra .7s var(--ease); }
+@keyframes entra { from { opacity: 0; transform: rotate(-10deg) translateY(20px) scale(.92); } }
+.sup-code { position: absolute; z-index: 0; bottom: 4%; right: 2%; font-size: clamp(90px, 13vw, 180px); color: transparent; -webkit-text-stroke: 2px rgba(255, 255, 255, .22); }
+.sup-badge { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; background: #fff; color: var(--blue); font-family: var(--tech); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.sup h3 { font-size: clamp(44px, 5.4vw, 78px); margin: 14px 0 12px; }
+.sup p { color: rgba(255, 255, 255, .84); max-width: 520px; }
+.sup-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 20px; }
+.sup-chips span { height: 32px; padding: 0 14px; display: inline-flex; align-items: center; border-radius: 8px; background: rgba(4, 5, 26, .35); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); font-size: 13px; font-weight: 600; }
+.barras { display: grid; gap: 12px; max-width: 460px; margin-bottom: 26px; }
+.barra { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 14px; font-family: var(--tech); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .78); }
+.barra i { height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .15); overflow: hidden; }
+.barra i::after { content: ''; display: block; height: 100%; width: var(--v); background: linear-gradient(90deg, var(--cyan), #fff); border-radius: inherit; transition: width 1s var(--ease); }
+.sup-tabs { display: flex; justify-content: center; }
+.sup-tabs .tabs { background: rgba(4, 5, 26, .45); }
+.sup-tabs .tabs button { display: flex; flex-direction: column; align-items: center; line-height: 1; padding: 12px 26px; }
+.sup-tabs .tabs button small { font-family: var(--tech); font-style: normal; font-size: 10px; letter-spacing: .12em; margin-top: 4px; opacity: .8; }
+.sup-tabs .tabs-pill { background: #fff; }
+.sup-tabs .tabs button[aria-selected="true"] { color: var(--blue); }
+
+/* calculadora */
+.calc { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(20px, 4vw, 50px); align-items: center; padding: clamp(24px, 4vw, 48px); border-radius: 28px; background: #fff; box-shadow: 0 40px 80px -50px rgba(10, 20, 90, .7); }
+.pie { position: relative; display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 18px; }
+.pie svg { width: clamp(110px, 14vw, 170px); height: auto; color: var(--blue); transition: transform .4s var(--ease); transform-origin: bottom center; }
+.pie-cm { font-size: clamp(54px, 7vw, 86px); color: var(--ink); line-height: .9; }
+.pie-cm small { display: block; font-family: var(--tech); font-style: normal; font-size: 12px; letter-spacing: .14em; color: var(--ink-2); }
+.calc label { display: block; font-family: var(--tech); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; }
+.calc input[type=range] { width: 100%; accent-color: var(--blue); height: 32px; }
+.rango { display: flex; justify-content: space-between; font-family: var(--tech); font-size: 11px; color: var(--ink-2); }
+.res { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 8px; margin: 22px 0 16px; }
+.res div { padding: 12px 14px; border-radius: 14px; background: var(--ice); }
+.res div:first-child { background: linear-gradient(120deg, var(--blue-2), var(--blue)); color: #fff; }
+.res small { display: block; font-family: var(--tech); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.res b { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 44px; line-height: 1; }
+.ancho { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: var(--tech); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.ancho .seg { display: inline-flex; padding: 4px; border-radius: 10px; background: var(--ice); }
+.ancho .seg button { height: 34px; padding: 0 16px; border-radius: 8px; font-family: var(--tech); font-weight: 700; font-size: 12px; letter-spacing: .1em; color: var(--ink-2); }
+.ancho .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.consejo { margin-top: 16px; padding: 14px 16px; border-left: 3px solid var(--blue); background: var(--ice); color: var(--ink); font-size: 14px; border-radius: 0 12px 12px 0; }
+.como { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 36px; }
+.como div { padding: 20px; border-radius: 18px; background: #fff; box-shadow: 0 20px 40px -34px rgba(10, 20, 90, .7); }
+.como b { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 34px; color: var(--blue); }
+.como h4 { margin: 6px 0 4px; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 21px; text-transform: uppercase; }
+.como p { color: var(--ink-2); font-size: 14px; }
+
+@media (max-width: 900px) {
+  .sup, .calc { grid-template-columns: 1fr; }
+  .sup-vis { max-width: 380px; margin: 0 auto; }
+  .como { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .sup-tabs .tabs button { padding: 10px 14px; }
+  .barra { grid-template-columns: 110px 1fr; }
+  .res { grid-template-columns: 1fr 1fr; }
+  .res div:first-child { grid-column: 1 / -1; }
+  .res b { font-size: 38px; }
+}

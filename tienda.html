@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es-CO" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tienda · VAR Tienda Deportiva × Seven Pro League</title>
+<meta name="description" content="Guayos para césped natural, torretín para sintética y zapatillas de futsal. Elige tu modelo, color y talla, y pide por WhatsApp.">
+<meta name="theme-color" content="#04051A">
+<link rel="icon" type="image/png" href="assets/img/logos/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/logos/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://sevenpro-api.sarmientobrayder10.workers.dev" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/tienda.css">
+<script>document.documentElement.classList.replace('no-js', 'js')</script>
+</head>
+<body data-page="tienda">
+<main>
+  <section class="page-hero shop-hero">
+    <span class="hero-ghost display" aria-hidden="true">VAR</span>
+    <div class="wrap">
+      <p class="crumbs"><a href="index.html">Inicio</a> / Tienda</p>
+      <h1 class="display h1">Elige tu <span class="accent">arma.</span></h1>
+      <p class="lead">Guayos, torretín y futsal. Filtra por cancha y marca, elige color y talla, y pide por WhatsApp.</p>
+      <div class="cats" id="hero-cats"></div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:28px" id="catalogo">
+    <div class="wrap">
+      <div class="toolbar" id="toolbar">
+        <div class="tb-row">
+          <div class="tabs" role="tablist" aria-label="Superficie" id="tabs"><span class="tabs-pill"></span></div>
+          <label class="search"><span class="sr">Buscar</span><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar modelo: Predator, Mercurial…" autocomplete="off"></label>
+        </div>
+        <div class="tb-row">
+          <div class="chips" id="marcas" role="group" aria-label="Marca"></div>
+          <div class="tb-tools">
+            <label class="chk"><input type="checkbox" id="nino"> Niño</label>
+            <label class="sel"><span class="sr">Ordenar</span><select id="orden"><option value="nuevo">Más nuevos</option><option value="asc">Menor precio</option><option value="desc">Mayor precio</option><option value="az">A – Z</option></select></label>
+          </div>
+        </div>
+      </div>
+      <p class="count" id="count" aria-live="polite"></p>
+      <div class="pgrid" id="grid" style="margin-top:14px"></div>
+      <div class="ver-mas" id="ver-mas"></div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="banner r">
+        <div><p class="eyebrow" style="color:var(--cyan-2)">Guía del jugador</p><h2 class="display h2" style="margin-top:12px">¿No sabes qué <span class="accent">suela</span> usar?</h2>
+          <p>FG, TF o IC: te mostramos cuál agarra mejor en tu cancha y te calculamos la talla exacta.</p>
+          <a class="btn btn-light" href="guia.html">Ver la guía <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+        <img src="assets/img/suelas/tf.webp" alt="" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head center"><div><p class="eyebrow r">Cómo comprar</p><h2 class="display h2 r">Del carrito <span class="grad">a la cancha.</span></h2></div></div>
+      <div class="pasos">
+        <div class="paso r"><b>1</b><h3>Elige tu guayo</h3><p>Filtra por cancha, marca y precio.</p></div>
+        <div class="paso r" style="--d:.08s"><b>2</b><h3>Escoge color y talla</h3><p>Usa la guía si tienes dudas.</p></div>
+        <div class="paso r" style="--d:.16s"><b>3</b><h3>Pide por WhatsApp</h3><p>Te confirmamos disponibilidad al instante.</p></div>
+        <div class="paso r" style="--d:.24s"><b>4</b><h3>Acordamos la entrega</h3><p>Pago y envío se coordinan por chat.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/tienda.js"></script>
+</body>
+</html>
