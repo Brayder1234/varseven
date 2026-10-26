@@ -205,7 +205,7 @@
       const id = m.tipo === 'video' ? SP.youtubeId(m.url) : '';
       const img = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : m.tipo === 'video' ? '' : m.url;
       // los videos se reproducen solos (sin sonido, en bucle) mientras están a la vista
-      const media = m.subido ? `<video src="${esc(m.url)}" preload="metadata" muted loop playsinline tabindex="-1" data-auto></video>`
+      const media = m.subido ? `<video src="${esc(m.url)}#t=0.1" preload="auto" muted loop playsinline webkit-playsinline tabindex="-1" data-auto></video><i class="play">▶</i>`
         : img ? `<img src="${esc(img)}" alt="${esc(copia ? '' : m.titulo || '')}" loading="lazy">${id ? `<div class="yt ${/\/shorts\//.test(m.url) ? 'short' : ''}" data-yt="${id}"></div>` : ''}` : '<div class="sin-mini">▶</div>';
       return `<button data-medio="${i}" class="${m.tipo === 'video' ? 'es-video' : ''}" ${copia ? 'tabindex="-1" aria-hidden="true"' : ''}>${media}${m.tipo === 'video' && !m.subido && !id ? '<i class="play">▶</i>' : ''}${m.titulo ? `<span>${esc(m.titulo)}</span>` : ''}</button>`;
     };
@@ -216,6 +216,16 @@
     $('#medios-grid').innerHTML = `<div class="cinta-pista" style="--dur:${Math.max(20, Math.round(ancho / 55))}s">${uno}${copia}</div>`;
     autoplay();
   }
+  // si el celular bloquea el autoplay (ahorro de batería o de datos), se deja el ícono de play y se reintenta en el primer toque o scroll
+  const arrancar = v => {
+    v.muted = true;
+    const p = v.play();
+    const marca = ok => v.closest('button')?.classList.toggle('auto-ok', ok);
+    if (p && p.then) p.then(() => marca(true)).catch(() => marca(false)); else marca(true);
+  };
+  ['touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(ev => addEventListener(ev, () => {
+    $$('#medios-grid video[data-auto]').forEach(v => { const r = v.getBoundingClientRect(); if (v.paused && r.right > 0 && r.left < innerWidth) arrancar(v); });
+  }, { passive: true, once: false }));
   // reproduce solo lo que se ve: así el celular no carga todos los videos a la vez
   let vistos;
   function autoplay() {
@@ -223,7 +233,7 @@
     if (SP.reduce || !('IntersectionObserver' in window)) return;
     vistos = new IntersectionObserver(es => es.forEach(e => {
       const v = e.target.matches('video') ? e.target : null, y = e.target.matches('.yt') ? e.target : null;
-      if (v) { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }
+      if (v) { if (e.isIntersecting) arrancar(v); else v.pause(); }
       if (y) {
         if (e.isIntersecting && !y.firstChild) y.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${y.dataset.yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${y.dataset.yt}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" title="" tabindex="-1" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
         else if (!e.isIntersecting) y.innerHTML = '';

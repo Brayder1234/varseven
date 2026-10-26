@@ -217,3 +217,6 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
 .cinta-pista .yt iframe { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); height: 100%; width: auto; aspect-ratio: 16 / 9; border: 0; pointer-events: none; }
 .cinta-pista .yt.short iframe { height: 142%; }
 .cinta-pista video { pointer-events: none; }
+
+/* el ícono de play de los videos subidos solo se ve si el celular no los dejó arrancar solos */
+.cinta-pista .es-video.auto-ok .play { display: none; }
