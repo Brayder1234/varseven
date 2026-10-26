@@ -323,7 +323,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .cuenta-tit { font-family: var(--tech); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--cyan-2); margin: 22px 0 10px; }
 
 /* ───────── responsive ───────── */
-@media (max-width: 1000px) { .banner { grid-template-columns: 1fr; } .banner img { max-height: 220px; } }
+@media (max-width: 1000px) { .banner { grid-template-columns: 1fr; } .banner img { max-height: 220px; margin-top: 30px; } }
 @media (max-width: 1080px) {
   .pgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .foot-grid { grid-template-columns: 1fr 1fr; }
