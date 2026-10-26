@@ -7,7 +7,7 @@
 .door-bg { position: absolute; inset: 0; z-index: -1; }
 .door-torneo { clip-path: polygon(0 0, 100% 0, calc(100% - 6vw) 100%, 0 100%); margin-right: -3vw; z-index: 2; }
 .door-tienda { clip-path: polygon(6vw 0, 100% 0, 100% 100%, 0 100%); margin-left: -3vw; padding-left: calc(clamp(28px, 4vw, 64px) + 4vw); }
-.door-torneo .door-bg { background: url(../img/torneo/portada-torneo.webp?v=2) center 32% / cover; }
+.door-torneo .door-bg { background: url(../img/torneo/portada-torneo.webp?v=3) center 28% / cover; }
 .door-torneo .door-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(36, 51, 224, .35) 0%, rgba(20, 28, 150, .75) 45%, rgba(4, 5, 26, .96) 100%), repeating-linear-gradient(115deg, rgba(255, 255, 255, .05) 0 2px, transparent 2px 46px); }
 .door-tienda .door-bg { background: radial-gradient(60% 55% at 60% 38%, color-mix(in srgb, var(--g) 30%, transparent), transparent 70%), linear-gradient(160deg, #0B1240, var(--n950) 70%); transition: --g 1s var(--ease); }
 /* el escudo y los guayos van en el flujo (arriba), el texto abajo: así nunca se tapan, sea cual sea el tamaño de pantalla */
