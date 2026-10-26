@@ -100,9 +100,10 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
 .md-head small { display: block; font-family: var(--tech); font-size: 11px; color: var(--muted); letter-spacing: .1em; margin-top: 6px; }
 .md-body { padding: 0 22px 26px; }
 .md-body h4 { margin: 0 0 10px; font-family: var(--tech); font-size: 12px; letter-spacing: .2em; color: var(--cyan); text-transform: uppercase; }
-.md-goles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.md-goles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.md-goles ul + ul { padding-left: 12px; border-left: 1px solid var(--line-2, rgba(255,255,255,.14)); }
 .md-goles ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.md-goles li { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.md-goles li { display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
 .md-goles li b { font-family: var(--tech); color: var(--cyan); }
 .md-goles .v li { flex-direction: row-reverse; text-align: right; }
 .md-nota { margin-top: 14px; font-size: 13px; color: var(--dim); }
@@ -184,8 +185,8 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
   .podio-item b { font-size: 15px; }
   .ins-list li { grid-template-columns: 1fr; gap: 2px; }
   .md-head .res { font-size: 48px; }
-  .md-goles { grid-template-columns: 1fr; }
-  .md-goles .v li { flex-direction: row; text-align: left; }
+  .md-goles { gap: 10px; }
+  .md-goles li { font-size: 13px; align-items: flex-start; }
   .lb-img { padding: 60px 8px 10px; }
   .lb-prev, .lb-next { top: auto; bottom: max(14px, env(safe-area-inset-bottom)); margin: 0; }
   .galeria { columns: 2; column-gap: 8px; }
