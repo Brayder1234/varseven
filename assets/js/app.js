@@ -357,6 +357,7 @@ $('#bag-list').addEventListener('click', e => {
 });
 SP.abrirBolsa = () => {
   if (!bag.hidden) return;
+  $('#toast').classList.remove('show'); // el aviso no debe tapar el botón de enviar pedido
   bag.hidden = false; SP.lock();
   requestAnimationFrame(() => requestAnimationFrame(() => bag.classList.add('open')));
   history.pushState({ bolsa: 1 }, '', location.pathname + location.search + '#bolsa');

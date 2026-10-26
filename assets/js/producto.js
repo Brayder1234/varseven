@@ -1,4 +1,11 @@
 // Ficha de producto: color, talla, bolsa y pedido por WhatsApp
+// varias descripciones importadas vienen cortadas a mitad de frase: se muestran hasta la última frase completa
+const descLimpia = d => {
+  let t = String(d).replace(/_{3,}/g, ' ').replace(/\s+/g, ' ').trim();
+  if (/[.!?)»"]$/.test(t)) return t;
+  const k = Math.max(t.lastIndexOf('. '), t.lastIndexOf('! '), t.lastIndexOf('? '));
+  return k > 40 ? t.slice(0, k + 1) : t.replace(/[,;:\s]+$/, '') + '…';
+};
 'use strict';
 (() => {
   const { $, $$, esc, fmt, ICON } = SP;
@@ -30,7 +37,7 @@
   function pintar() {
     const cat = SP.CATS[P.cat] || {};
     const nombre = `${P.marca} ${P.nombre}`;
-    document.title = `${nombre} · VAR Tienda Deportiva`;
+    document.title = `${nombre} · Seven Pro Shop × VAR`;
     $('meta[name="description"]').setAttribute('content', `${nombre} — ${cat.nombre || ''} ${cat.code || ''}. ${fmt(color.precio || P.precio)}. Pide por WhatsApp.`);
     $('#crumbs').innerHTML = `<a href="index.html">Inicio</a> / <a href="tienda.html">Tienda</a> / <a href="tienda.html?cat=${esc(P.cat)}">${esc(cat.nombre || '')}</a> / ${esc(P.nombre)}`;
     const precio = color.precio || P.precio, antes = color.antes || 0;
@@ -45,7 +52,7 @@
         <p class="marca">${esc(P.marca)} <span>· ${esc(cat.nombre || '')} ${esc(cat.code || '')}</span></p>
         <h1 class="display">${esc(P.nombre)}</h1>
         <div class="pd-price">${SP.descuentoHoy() ? `<b>${fmt(SP.menos(precio, SP.descuentoHoy()))}</b><s>${fmt(precio)}</s><em>-${SP.descuentoHoy()}% hoy</em>` : `<b>${fmt(precio)}</b>${SP.rebaja(precio, antes) ? `<s>${fmt(antes)}</s><em>-${SP.rebaja(precio, antes)}%</em>` : ''}`}</div>
-        ${P.desc ? `<p class="pd-desc">${esc(P.desc)}</p>` : ''}
+        ${P.desc ? `<p class="pd-desc">${esc(descLimpia(P.desc))}</p>` : ''}
         <div class="specs">${[['Superficie', cat.sup], ['Suela', cat.code], ['Colores', P.colores.length]].filter(x => x[1]).map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>
         ${P.colores.length > 1 ? `<div class="pd-block"><h3>Color <b>${esc(color.nombre || '')}</b></h3><div class="colores" id="colores">${P.colores.map(c => `<button style="--c:${esc(c.hex?.[0] || '#888')}" data-c="${esc(c.id)}" aria-pressed="${c.id === color.id}" aria-label="Color ${esc(c.nombre)}"><img src="${esc(c.foto || SP.img(c.fotos?.[0], 160))}" alt="" loading="lazy"></button>`).join('')}</div></div>` : ''}
         <div class="pd-block" id="bloque-talla"><h3>Talla <a href="#" id="ver-guia">Guía de tallas</a></h3>
