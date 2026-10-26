@@ -175,7 +175,8 @@
     const tecla = e => { if (e.key === 'Escape') cerrar(); };
     pop.addEventListener('click', e => { if (e.target.closest('[data-x]')) cerrar(); });
     document.addEventListener('keydown', tecla);
-    document.body.appendChild(pop);
-    setTimeout(() => pop.classList.add('on'), 700);
+    const mostrar = () => { document.body.appendChild(pop); setTimeout(() => pop.classList.add('on'), 700); };
+    // si está la apertura del estadio, la ventana espera a que termine
+    if (document.documentElement.classList.contains('intro-on')) document.addEventListener('sp:intro-fin', mostrar, { once: true }); else mostrar();
   });
 })();
