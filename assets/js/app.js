@@ -119,7 +119,7 @@ SP.PROMOS = {
   inscritos: { activo: true, porcentaje: 10, domicilio: true, texto: 'Jugadores inscritos en la Seven Pro League' },
   mvp: { activo: true, porcentaje: null, texto: 'MVP de la fecha' },
   // oferta por fechas (hora de Colombia, ambos días incluidos): lanzamiento de la página web
-  lanzamiento: { activo: true, porcentaje: 20, desde: '2026-10-27', hasta: '2026-11-03', texto: 'Oferta de lanzamiento' },
+  lanzamiento: { activo: true, porcentaje: 20, desde: '2026-10-26', hasta: '2026-11-03', texto: 'Oferta de lanzamiento' },
 };
 SP.promos = () => { const p = SP.sitio?.promos || {}; return Object.fromEntries(Object.entries(SP.PROMOS).map(([k, v]) => [k, { ...v, ...(p[k] || {}) }])); };
 SP.DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
