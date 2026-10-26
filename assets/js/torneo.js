@@ -204,15 +204,32 @@
     const tarjeta = (m, i, copia) => {
       const id = m.tipo === 'video' ? SP.youtubeId(m.url) : '';
       const img = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : m.tipo === 'video' ? '' : m.url;
-      const media = m.subido ? `<video src="${esc(m.url)}#t=0.5" preload="metadata" muted playsinline tabindex="-1"></video>`
-        : img ? `<img src="${esc(img)}" alt="${esc(copia ? '' : m.titulo || '')}" loading="lazy">` : '<div class="sin-mini">▶</div>';
-      return `<button data-medio="${i}" class="${m.tipo === 'video' ? 'es-video' : ''}" ${copia ? 'tabindex="-1" aria-hidden="true"' : ''}>${media}${m.tipo === 'video' ? '<i class="play">▶</i>' : ''}${m.titulo ? `<span>${esc(m.titulo)}</span>` : ''}</button>`;
+      // los videos se reproducen solos (sin sonido, en bucle) mientras están a la vista
+      const media = m.subido ? `<video src="${esc(m.url)}" preload="metadata" muted loop playsinline tabindex="-1" data-auto></video>`
+        : img ? `<img src="${esc(img)}" alt="${esc(copia ? '' : m.titulo || '')}" loading="lazy">${id ? `<div class="yt ${/\/shorts\//.test(m.url) ? 'short' : ''}" data-yt="${id}"></div>` : ''}` : '<div class="sin-mini">▶</div>';
+      return `<button data-medio="${i}" class="${m.tipo === 'video' ? 'es-video' : ''}" ${copia ? 'tabindex="-1" aria-hidden="true"' : ''}>${media}${m.tipo === 'video' && !m.subido && !id ? '<i class="play">▶</i>' : ''}${m.titulo ? `<span>${esc(m.titulo)}</span>` : ''}</button>`;
     };
     const vueltas = Math.max(1, Math.ceil(7 / (medList.length || 1)));
     const uno = Array.from({ length: vueltas }, (_, k) => medList.map((m, i) => tarjeta(m, i, k > 0))).flat().join('');
     const copia = medList.map((m, i) => tarjeta(m, i, true)).join('').repeat(vueltas);
     const ancho = medList.length * vueltas * (SP.movil.matches ? 188 : 250); // alto de la tarjeta × proporción + separación
     $('#medios-grid').innerHTML = `<div class="cinta-pista" style="--dur:${Math.max(20, Math.round(ancho / 55))}s">${uno}${copia}</div>`;
+    autoplay();
+  }
+  // reproduce solo lo que se ve: así el celular no carga todos los videos a la vez
+  let vistos;
+  function autoplay() {
+    vistos?.disconnect();
+    if (SP.reduce || !('IntersectionObserver' in window)) return;
+    vistos = new IntersectionObserver(es => es.forEach(e => {
+      const v = e.target.matches('video') ? e.target : null, y = e.target.matches('.yt') ? e.target : null;
+      if (v) { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }
+      if (y) {
+        if (e.isIntersecting && !y.firstChild) y.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${y.dataset.yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${y.dataset.yt}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" title="" tabindex="-1" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+        else if (!e.isIntersecting) y.innerHTML = '';
+      }
+    }), { threshold: .35 });
+    $$('#medios-grid video[data-auto], #medios-grid .yt').forEach(el => vistos.observe(el));
   }
 
   const lb = $('#lb');

@@ -211,3 +211,9 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
 .lb-vid { max-width: 100%; max-height: 82vh; border-radius: 12px; background: #000; }
 @media (max-width: 760px) { .cinta-pista { gap: 10px; } .cinta-pista button { width: 178px; height: 222px; border-radius: 12px; } }
 @media (prefers-reduced-motion: reduce) { .cinta { overflow-x: auto; } .cinta-pista { animation: none; } }
+
+/* videos que se reproducen solos dentro de la cinta */
+.cinta-pista .yt { position: absolute; inset: 0; overflow: hidden; background: #000; }
+.cinta-pista .yt iframe { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); height: 100%; width: auto; aspect-ratio: 16 / 9; border: 0; pointer-events: none; }
+.cinta-pista .yt.short iframe { height: 142%; }
+.cinta-pista video { pointer-events: none; }
