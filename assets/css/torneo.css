@@ -103,9 +103,9 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
 .md-goles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 .md-goles ul + ul { padding-left: 12px; border-left: 1px solid var(--line-2, rgba(255,255,255,.14)); }
 .md-goles ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.md-goles li { display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
-.md-goles li b { font-family: var(--tech); color: var(--cyan); }
-.md-goles .v li { flex-direction: row-reverse; text-align: right; }
+.md-goles li { display: block; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+.md-goles li b { font-family: var(--tech); color: var(--cyan); white-space: nowrap; margin-left: 4px; }
+.md-goles .v li { text-align: right; }
 .md-nota { margin-top: 14px; font-size: 13px; color: var(--dim); }
 .md-fotos { width: 100%; margin-top: 16px; }
 .md-mvp { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: rgba(63, 224, 240, .1); font-weight: 600; }
@@ -186,7 +186,7 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
   .ins-list li { grid-template-columns: 1fr; gap: 2px; }
   .md-head .res { font-size: 48px; }
   .md-goles { gap: 10px; }
-  .md-goles li { font-size: 13px; align-items: flex-start; }
+  .md-goles li { font-size: 13px; }
   .lb-img { padding: 60px 8px 10px; }
   .lb-prev, .lb-next { top: auto; bottom: max(14px, env(safe-area-inset-bottom)); margin: 0; }
   .galeria { columns: 2; column-gap: 8px; }
