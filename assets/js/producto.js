@@ -51,7 +51,7 @@ const descLimpia = d => {
       <div class="pd-info">
         <p class="marca">${esc(P.marca)} <span>· ${esc(cat.nombre || '')} ${esc(cat.code || '')}</span></p>
         <h1 class="display">${esc(P.nombre)}</h1>
-        <div class="pd-price">${SP.descuentoHoy() ? `<b>${fmt(SP.menos(precio, SP.descuentoHoy()))}</b><s>${fmt(precio)}</s><em>-${SP.descuentoHoy()}% hoy</em>` : `<b>${fmt(precio)}</b>${SP.rebaja(precio, antes) ? `<s>${fmt(antes)}</s><em>-${SP.rebaja(precio, antes)}%</em>` : ''}`}</div>
+        <div class="pd-price">${SP.descuentoHoy() ? `<b>${fmt(SP.menos(precio, SP.descuentoHoy()))}</b><s>${fmt(precio)}</s><em>-${SP.descuentoHoy()}% oferta</em>` : `<b>${fmt(precio)}</b>${SP.rebaja(precio, antes) ? `<s>${fmt(antes)}</s><em>-${SP.rebaja(precio, antes)}%</em>` : ''}`}</div>
         ${P.desc ? `<p class="pd-desc">${esc(descLimpia(P.desc))}</p>` : ''}
         <div class="specs">${[['Superficie', cat.sup], ['Suela', cat.code], ['Colores', P.colores.length]].filter(x => x[1]).map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>
         ${P.colores.length > 1 ? `<div class="pd-block"><h3>Color <b>${esc(color.nombre || '')}</b></h3><div class="colores" id="colores">${P.colores.map(c => `<button style="--c:${esc(c.hex?.[0] || '#888')}" data-c="${esc(c.id)}" aria-pressed="${c.id === color.id}" aria-label="Color ${esc(c.nombre)}"><img src="${esc(c.foto || SP.img(c.fotos?.[0], 160))}" alt="" loading="lazy"></button>`).join('')}</div></div>` : ''}

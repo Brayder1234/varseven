@@ -118,12 +118,22 @@ SP.PROMOS = {
   martes: { activo: true, dia: 2, porcentaje: 10, texto: 'Martes de descuento' },
   inscritos: { activo: true, porcentaje: 10, domicilio: true, texto: 'Jugadores inscritos en la Seven Pro League' },
   mvp: { activo: true, porcentaje: null, texto: 'MVP de la fecha' },
+  // oferta por fechas (hora de Colombia, ambos días incluidos): lanzamiento de la página web
+  lanzamiento: { activo: true, porcentaje: 20, desde: '2026-10-27', hasta: '2026-11-02', texto: 'Oferta de lanzamiento' },
 };
 SP.promos = () => { const p = SP.sitio?.promos || {}; return Object.fromEntries(Object.entries(SP.PROMOS).map(([k, v]) => [k, { ...v, ...(p[k] || {}) }])); };
 SP.DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 SP.hoyBogota = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' }));
-// descuento automático del día (por defecto, los martes)
-SP.descuentoHoy = () => { const m = SP.promos().martes; return m.activo && +m.porcentaje > 0 && SP.hoyBogota().getDay() === +m.dia ? +m.porcentaje : 0; };
+// ofertas automáticas de hoy: la de lanzamiento (por fechas) y la del día de la semana (por defecto, los martes); gana la mayor
+SP.fechaHoy = () => { const h = SP.hoyBogota(), z = n => String(n).padStart(2, '0'); return `${h.getFullYear()}-${z(h.getMonth() + 1)}-${z(h.getDate())}`; };
+SP.lanzamientoActivo = () => { const l = SP.promos().lanzamiento, h = SP.fechaHoy(); return l.activo && +l.porcentaje > 0 && (!l.desde || h >= l.desde) && (!l.hasta || h <= l.hasta) ? l : null; };
+SP.ofertaHoy = () => {
+  const P = SP.promos(), m = P.martes, l = SP.lanzamientoActivo(), op = [];
+  if (m.activo && +m.porcentaje > 0 && SP.hoyBogota().getDay() === +m.dia) op.push({ pct: +m.porcentaje, por: m.texto || `Descuento de los ${SP.DIAS[+m.dia]}` });
+  if (l) op.push({ pct: +l.porcentaje, por: l.texto || 'Oferta de lanzamiento' });
+  return op.sort((a, b) => b.pct - a.pct)[0] || null;
+};
+SP.descuentoHoy = () => SP.ofertaHoy()?.pct || 0;
 SP.menos = (precio, pct) => Math.round(precio * (1 - pct / 100) / 100) * 100;
 SP.CATS = { guayos: { nombre: 'Guayos', code: 'FG', sup: 'Césped natural' }, torretin: { nombre: 'Torretín', code: 'TF', sup: 'Grama sintética' }, futsal: { nombre: 'Futsal', code: 'IC', sup: 'Cancha cubierta' } };
 SP.urlProducto = (p, color) => `producto.html?id=${encodeURIComponent(p.id)}${color ? '&c=' + encodeURIComponent(color) : ''}`;
@@ -280,8 +290,8 @@ if (typeof benef.mvp !== 'object') benef.mvp = null;
 let mvpError = '';
 function descuentoBolsa() {
   const P = SP.promos(), op = [];
-  const hoy = SP.descuentoHoy();
-  if (hoy) op.push({ pct: hoy, por: P.martes.texto || `Descuento de los ${SP.DIAS[+P.martes.dia]}` });
+  const hoy = SP.ofertaHoy();
+  if (hoy) op.push(hoy);
   if (benef.inscrito && P.inscritos.activo && +P.inscritos.porcentaje) op.push({ pct: +P.inscritos.porcentaje, por: 'Jugador inscrito en la Seven Pro League' });
   if (benef.mvp && P.mvp.activo) op.push({ pct: +benef.mvp.pct, por: `MVP de la fecha · ${benef.mvp.codigo}` });
   return op.sort((a, b) => b.pct - a.pct)[0] || null; // los descuentos no se suman: se aplica el mayor

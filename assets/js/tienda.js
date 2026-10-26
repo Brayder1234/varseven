@@ -24,10 +24,12 @@
   });
   // promociones (panel → Promociones): martes, jugadores inscritos y MVP de la fecha
   function pintarPromos() {
-    const P = SP.promos(), hoy = SP.descuentoHoy(), dia = SP.DIAS[+P.martes.dia] || 'martes';
-    const pi = +P.inscritos.porcentaje, pm = +P.mvp.porcentaje;
+    const P = SP.promos(), dia = SP.DIAS[+P.martes.dia] || 'martes';
+    const martesHoy = SP.hoyBogota().getDay() === +P.martes.dia, pi = +P.inscritos.porcentaje, pm = +P.mvp.porcentaje;
+    const lz = SP.lanzamientoActivo(), fin = lz?.hasta ? new Date(lz.hasta + 'T12:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) : '';
     const l = [
-      P.martes.activo && +P.martes.porcentaje && { on: !!hoy, big: `-${P.martes.porcentaje}%`, t: hoy ? `¡Hoy es ${dia} de descuento!` : `Todos los ${dia}`, s: hoy ? 'El precio con descuento ya aparece en cada guayo.' : `${P.martes.porcentaje}% de descuento en toda la tienda.` },
+      lz && { on: true, big: `-${lz.porcentaje}%`, t: lz.texto || 'Oferta de lanzamiento', s: `${lz.porcentaje}% de descuento en toda la tienda${fin ? ' hasta el ' + fin : ''}. El precio con descuento ya aparece en cada guayo.` },
+      P.martes.activo && +P.martes.porcentaje && { on: martesHoy, big: `-${P.martes.porcentaje}%`, t: martesHoy ? `¡Hoy es ${dia} de descuento!` : `Todos los ${dia}`, s: martesHoy ? 'El precio con descuento ya aparece en cada guayo.' : `${P.martes.porcentaje}% de descuento en toda la tienda.` },
       P.inscritos.activo && { big: pi ? `${pi}%` : '✓', t: '¿Juegas la Seven Pro League?', s: `${pi ? pi + '% de descuento' : 'Descuento'} cualquier día${P.inscritos.domicilio ? ' + domicilio gratis' : ''}. Márcalo en la bolsa.` },
       P.mvp.activo && { big: 'MVP', t: 'MVP de la fecha', s: 'Descuento personal para el mejor jugador de cada fecha. Recibes un código de un solo uso para la bolsa.' },
     ].filter(Boolean);
