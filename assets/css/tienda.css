@@ -5,8 +5,8 @@
 .shop-hero .cats a:hover { background: rgba(255, 255, 255, .14); }
 .shop-hero .cats b { font-family: var(--tech); font-style: normal; font-size: 11px; padding: 2px 6px; border-radius: 5px; background: var(--cyan); color: var(--n950); }
 
-.toolbar { position: sticky; top: var(--nav); z-index: 30; display: grid; gap: 10px; padding: 14px 0; margin-bottom: 22px; transition: top .45s var(--ease); }
-.nav-hide .toolbar { top: 0; }
+.toolbar { position: sticky; top: calc(var(--nav) + var(--live)); z-index: 30; display: grid; gap: 10px; padding: 14px 0; margin-bottom: 22px; transition: top .45s var(--ease); }
+.nav-hide .toolbar { top: var(--live); }
 .toolbar::before { content: ''; position: absolute; inset: 0 calc(50% - 50vw); z-index: -1; background: #05061D; border-bottom: 1px solid var(--line); opacity: 0; transition: opacity .3s; }
 .toolbar.stuck::before { opacity: 1; }
 .tb-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; min-width: 0; }
@@ -62,7 +62,7 @@
 .pd-crumbs a:hover { color: var(--text); }
 .pd-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(26px, 4vw, 56px); align-items: start; }
 .pd-gal, .pd-info { min-width: 0; }
-.pd-gal { position: sticky; top: calc(var(--nav) + 16px); }
+.pd-gal { position: sticky; top: calc(var(--nav) + var(--live) + 16px); }
 .pd-stage { position: relative; aspect-ratio: 1 / .86; border-radius: 26px; overflow: hidden; display: grid; place-items: center;
   background: radial-gradient(62% 56% at 50% 46%, color-mix(in srgb, var(--g) 36%, transparent), transparent 74%), linear-gradient(180deg, #111C62, var(--n850)); box-shadow: inset 0 0 0 1px var(--line); transition: --g .8s; }
 .pd-stage::after { content: ''; position: absolute; left: 50%; top: 46%; width: 70%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; border: 1px dashed rgba(210, 225, 255, .14); pointer-events: none; }

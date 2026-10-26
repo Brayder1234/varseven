@@ -10,8 +10,8 @@
 .t-stats small { font-family: var(--tech); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan-2); }
 
 /* sub-navegación fija */
-.subnav { position: sticky; top: var(--nav); z-index: 40; margin-top: -42px; transition: top .45s var(--ease); }
-.nav-hide .subnav { top: 0; }
+.subnav { position: sticky; top: calc(var(--nav) + var(--live)); z-index: 40; margin-top: -42px; transition: top .45s var(--ease); }
+.nav-hide .subnav { top: var(--live); }
 .subnav .wrap { display: flex; justify-content: center; }
 .subnav nav { display: flex; gap: 2px; padding: 5px; overflow-x: auto; scrollbar-width: none; max-width: 100%; background: #0A0F33; box-shadow: 0 16px 30px -18px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--line-2); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
 .subnav nav::-webkit-scrollbar { display: none; }

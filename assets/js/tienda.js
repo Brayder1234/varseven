@@ -29,7 +29,7 @@
     const l = [
       P.martes.activo && +P.martes.porcentaje && { on: !!hoy, big: `-${P.martes.porcentaje}%`, t: hoy ? `¡Hoy es ${dia} de descuento!` : `Todos los ${dia}`, s: hoy ? 'El precio con descuento ya aparece en cada guayo.' : `${P.martes.porcentaje}% de descuento en toda la tienda.` },
       P.inscritos.activo && { big: pi ? `${pi}%` : '✓', t: '¿Juegas la Seven Pro League?', s: `${pi ? pi + '% de descuento' : 'Descuento'} cualquier día${P.inscritos.domicilio ? ' + domicilio gratis' : ''}. Márcalo en la bolsa.` },
-      P.mvp.activo && { big: 'MVP', t: 'MVP de la fecha', s: `${pm ? pm + '% de descuento' : 'Descuento especial'} para los mejores de cada fecha. Márcalo en la bolsa.` },
+      P.mvp.activo && { big: 'MVP', t: 'MVP de la fecha', s: 'Descuento personal para el mejor jugador de cada fecha. Recibes un código de un solo uso para la bolsa.' },
     ].filter(Boolean);
     $('#promos').innerHTML = l.map((x, i) => `<div class="promo ${x.on ? 'on' : ''} r" style="--d:${i * .07}s"><b class="display">${esc(x.big)}</b><div><h3>${esc(x.t)}</h3><p>${esc(x.s)}</p></div></div>`).join('');
     $('.promos-sec').hidden = !l.length;

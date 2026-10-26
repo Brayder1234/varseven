@@ -185,7 +185,7 @@
       ins.innerHTML = `🏷️ Si juegas el torneo: <b>${+P.inscritos.porcentaje ? P.inscritos.porcentaje + '% de descuento' : 'descuento'}</b> en la tienda cualquier día${P.inscritos.domicilio ? ' y <b>domicilio gratis</b>' : ''}.`;
     }
     mvp.hidden = !P.mvp.activo;
-    mvp.innerHTML = `⭐ Los MVP de la fecha tienen <b>${+P.mvp.porcentaje ? P.mvp.porcentaje + '% de descuento' : 'un descuento especial'}</b> en la tienda.`;
+    mvp.innerHTML = '⭐ Los MVP de la fecha reciben un <b>código de descuento personal</b> para la tienda (se usa una sola vez).';
   }
 
   function galeria() {

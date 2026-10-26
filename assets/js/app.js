@@ -1,4 +1,4 @@
-// Seven Pro League × VAR Tienda Deportiva — base compartida por todas las páginas.
+// Seven Pro League × VAR — base compartida por todas las páginas.
 // Datos: la API del panel (Cloudflare Worker) es la fuente; si falla, se usan las copias de /data.
 'use strict';
 
@@ -175,8 +175,8 @@ document.body.insertAdjacentHTML('afterbegin', `
   <a class="live-bar" id="live-bar" href="torneo.html#envivo" hidden></a>
   <header class="nav" id="nav">
     <div class="wrap nav-in">
-      <a class="brand" href="index.html" aria-label="Seven Pro League × VAR Tienda Deportiva — inicio">
-        <img src="assets/img/logos/seven-pro-league.png" alt="" width="46" height="46"><span class="x">×</span><img class="var" src="assets/img/logos/var-tienda.png" alt="">
+      <a class="brand" href="index.html" aria-label="Seven Pro Shop × VAR — inicio">
+        <img src="assets/img/logos/seven-pro-league.png" alt="" width="46" height="46"><span class="x">×</span><img class="var" src="assets/img/logos/var-seven-pro-shop.webp" alt="">
         <span class="brand-t"><b>Seven Pro</b><small>League · Shop</small></span>
       </a>
       <nav class="links" aria-label="Secciones">${PAGINAS.map(([k, h, t]) => `<a href="${h}"${k === pagina ? ' aria-current="page"' : ''}>${t}</a>`).join('')}</nav>
@@ -196,15 +196,15 @@ document.body.insertAdjacentHTML('beforeend', `
       <p class="foot-slogan display r">El poder del <span class="grad">fútbol aficionado</span></p>
       <div class="foot-grid">
         <div class="foot-brand">
-          <div class="logos"><img src="assets/img/logos/seven-pro-league.png" alt="Seven Pro League"><span class="display accent">×</span><img src="assets/img/logos/var-tienda.png" alt="VAR Tienda Deportiva"></div>
-          <p>Seven Pro League y VAR Tienda Deportiva: el torneo de fútbol 7 de Barranquilla y la tienda que lo equipa.</p>
+          <div class="logos"><img src="assets/img/logos/seven-pro-league.png" alt="Seven Pro League"><span class="display accent">×</span><img src="assets/img/logos/var-seven-pro-shop.webp" alt="Seven Pro Shop × VAR"></div>
+          <p>Seven Pro League y Seven Pro Shop × VAR: el torneo de fútbol 7 de Barranquilla y la tienda que lo equipa.</p>
         </div>
         <div><h4>Torneo</h4><ul><li><a href="torneo.html#posiciones">Posiciones</a></li><li><a href="torneo.html#resultados">Resultados</a></li><li><a href="torneo.html#goleadores">Goleadores</a></li><li><a href="torneo.html#inscripcion">Inscripciones</a></li></ul></div>
         <div><h4>Tienda</h4><ul><li><a href="tienda.html?cat=guayos">Guayos</a></li><li><a href="tienda.html?cat=torretin">Torretín</a></li><li><a href="tienda.html?cat=futsal">Futsal</a></li><li><a href="guia.html">Guía de tallas</a></li></ul></div>
         <div><h4>Síguenos</h4><ul id="foot-redes"></ul></div>
       </div>
       <div class="foot-b">
-        <span>© ${new Date().getFullYear()} Seven Pro League × VAR Tienda Deportiva</span>
+        <span>© ${new Date().getFullYear()} Seven Pro League × VAR</span>
         <a class="wn" href="https://www.webnaria.store/?utm_source=sevenpro&amp;utm_medium=footer" target="_blank" rel="noopener"><img src="assets/img/logos/webnaria.png" alt="">Página realizada por <b>Webnaria</b></a>
       </div>
     </div>
@@ -274,13 +274,16 @@ SP.agregar = it => {
 };
 function bump() { bagN.classList.remove('bump'); void bagN.offsetWidth; bagN.classList.add('bump'); }
 // beneficios que el cliente marca en la bolsa; la tienda los verifica por WhatsApp
-let benef = SP.store.get('sp:beneficios', { inscrito: false, equipo: '', mvp: false });
+// el MVP tiene un código de un solo uso: se valida con la API y se "gasta" al enviar el pedido
+let benef = SP.store.get('sp:beneficios', { inscrito: false, equipo: '', mvp: null });
+if (typeof benef.mvp !== 'object') benef.mvp = null;
+let mvpError = '';
 function descuentoBolsa() {
   const P = SP.promos(), op = [];
   const hoy = SP.descuentoHoy();
   if (hoy) op.push({ pct: hoy, por: P.martes.texto || `Descuento de los ${SP.DIAS[+P.martes.dia]}` });
   if (benef.inscrito && P.inscritos.activo && +P.inscritos.porcentaje) op.push({ pct: +P.inscritos.porcentaje, por: 'Jugador inscrito en la Seven Pro League' });
-  if (benef.mvp && P.mvp.activo && +P.mvp.porcentaje) op.push({ pct: +P.mvp.porcentaje, por: 'MVP de la fecha' });
+  if (benef.mvp && P.mvp.activo) op.push({ pct: +benef.mvp.pct, por: `MVP de la fecha · ${benef.mvp.codigo}` });
   return op.sort((a, b) => b.pct - a.pct)[0] || null; // los descuentos no se suman: se aplica el mayor
 }
 function pintarBolsa() {
@@ -299,18 +302,46 @@ function pintarBolsa() {
   $('#bag-promos').innerHTML = `
     ${P.inscritos.activo ? `<label class="bp"><input type="checkbox" data-benef="inscrito" ${benef.inscrito ? 'checked' : ''}><span><b>Juego en la Seven Pro League</b><small>${+P.inscritos.porcentaje ? `${P.inscritos.porcentaje}% de descuento` : 'Beneficio de jugador'}${P.inscritos.domicilio ? ' + domicilio gratis' : ''}</small></span></label>
       ${benef.inscrito ? `<input class="bp-eq" data-benef="equipo" placeholder="¿En qué equipo juegas?" value="${SP.esc(benef.equipo)}">` : ''}` : ''}
-    ${P.mvp.activo ? `<label class="bp"><input type="checkbox" data-benef="mvp" ${benef.mvp ? 'checked' : ''}><span><b>Soy MVP de la fecha</b><small>${+P.mvp.porcentaje ? `${P.mvp.porcentaje}% de descuento` : 'Descuento especial que te confirmamos por WhatsApp'}</small></span></label>` : ''}
+    ${P.mvp.activo ? (benef.mvp
+      ? `<div class="bp on"><span><b>⭐ MVP de la fecha · ${SP.esc(benef.mvp.jugador)}</b><small>Código ${SP.esc(benef.mvp.codigo)}: ${benef.mvp.pct}% de descuento (sirve una sola vez)</small></span><button class="bp-q" data-mvp="quitar">Quitar</button></div>`
+      : `<div class="bp-cod"><b>¿Eres MVP de la fecha?</b><small>Escribe tu código de descuento (sirve una sola vez)</small><div class="bp-cod-f"><input id="mvp-cod" placeholder="MVP-XXXXXXXX" autocapitalize="characters" autocomplete="off" spellcheck="false"><button class="btn btn-ghost btn-sm" data-mvp="aplicar">Aplicar</button></div>${mvpError ? `<p class="bp-err">${SP.esc(mvpError)}</p>` : ''}</div>`) : ''}
     <div class="bp-res">${d ? `<span>Subtotal <s>${SP.fmt(sub)}</s></span><span class="ok">−${d.pct}% · ${SP.esc(d.por)}</span>` : ''}${domicilio ? '<span class="ok">Domicilio gratis</span>' : ''}</div>`;
   $('#bag-total').textContent = SP.fmt(total);
   const t = SP.sitio?.tienda || {};
   const lineas = items.map(i => `• ${i.nombre} — ${i.colorNombre || ''}\n   Talla ${i.talla} · ${i.cant} ${i.cant > 1 ? 'pares' : 'par'} · ${SP.fmt(i.precio * i.cant)}`).join('\n');
   const extra = [
     benef.inscrito && `✅ Soy jugador inscrito en la Seven Pro League${benef.equipo ? ` (equipo: ${benef.equipo})` : ''}`,
-    benef.mvp && `⭐ Soy MVP de la fecha${+P.mvp.porcentaje ? '' : ' (descuento por confirmar)'}`,
+    benef.mvp && `⭐ MVP de la fecha: ${benef.mvp.jugador} — código ${benef.mvp.codigo} (${benef.mvp.pct}%)`,
   ].filter(Boolean).join('\n');
   const cuentas = d ? `Subtotal: ${SP.fmt(sub)}\nDescuento ${d.pct}% (${d.por}): −${SP.fmt(sub - total)}\nTotal: ${SP.fmt(total)}` : `Total: ${SP.fmt(total)}`;
   $('#bag-send').href = SP.wa(t.whatsapp || '573112204194', `Hola ${SP.marca()} 👋, quiero hacer este pedido:\n\n${lineas}\n\n${extra ? extra + '\n\n' : ''}${cuentas}${domicilio ? '\nDomicilio: gratis (jugador inscrito)' : ''}\n\n¿Me confirman disponibilidad, pago y entrega? ⚽`);
 }
+async function aplicarCodigo() {
+  const c = ($('#mvp-cod')?.value || '').trim(); if (!c) return;
+  mvpError = '';
+  try {
+    const r = await fetch(`${SP.API}/api/codigo?c=${encodeURIComponent(c)}`, { cache: 'no-store' }).then(r => r.json());
+    if (r.ok) benef.mvp = { codigo: r.codigo, jugador: r.jugador, pct: r.porcentaje }; else mvpError = r.motivo || 'Código no válido.';
+  } catch { mvpError = 'No pudimos revisar el código. Intenta de nuevo.'; }
+  SP.store.set('sp:beneficios', benef); pintarBolsa();
+}
+$('#bag-promos').addEventListener('click', e => {
+  const b = e.target.closest('[data-mvp]'); if (!b) return;
+  if (b.dataset.mvp === 'quitar') { benef.mvp = null; mvpError = ''; SP.store.set('sp:beneficios', benef); pintarBolsa(); } else aplicarCodigo();
+});
+$('#bag-promos').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'mvp-cod') { e.preventDefault(); aplicarCodigo(); } });
+// al enviar el pedido el código se gasta; si ya lo usaron, se avisa y no se envía con descuento
+$('#bag-send').addEventListener('click', async e => {
+  if (!benef.mvp) return;
+  e.preventDefault();
+  const a = e.currentTarget, href = a.href, c = benef.mvp.codigo;
+  try {
+    const r = await fetch(`${SP.API}/api/codigo/usar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ c }) }).then(r => r.json());
+    if (!r.ok) { benef.mvp = null; mvpError = r.motivo || 'Código no válido.'; SP.store.set('sp:beneficios', benef); pintarBolsa(); SP.toast('Ese código ya no es válido: se quitó el descuento.', false); return; }
+  } catch { SP.toast('No pudimos validar el código. Revisa tu conexión e intenta de nuevo.', false); return; }
+  benef.mvp = null; SP.store.set('sp:beneficios', benef);
+  location.href = href;
+});
 $('#bag-promos').addEventListener('input', e => {
   const el = e.target.closest('[data-benef]'); if (!el) return;
   benef[el.dataset.benef] = el.type === 'checkbox' ? el.checked : el.value;
@@ -349,16 +380,20 @@ $('#toast-btn').addEventListener('click', () => { $('#toast').classList.remove('
 // la barra roja sale en todas las páginas; la tarjeta grande en los lugares con [data-vivo]
 SP.youtubeId = u => (String(u || '').match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/) || [])[1] || '';
 let vivoTimer = null, vivoClave = '';
+// la barra EN VIVO se queda fija arriba; --live es su alto para que la cabecera y los filtros se acomoden debajo
+const medirVivo = () => { const b = $('#live-bar'); document.documentElement.style.setProperty('--live', (b.hidden ? 0 : b.offsetHeight) + 'px'); };
+addEventListener('resize', medirVivo);
 function pintarVivo(t) {
   const v = t?.envivo, bar = $('#live-bar');
   const on = !!(v && v.activo && (v.url || v.partido));
-  bar.hidden = !on;
+  bar.hidden = !on; medirVivo();
   $$('[data-vivo]').forEach(el => { el.hidden = !on; });
   if (!on) { clearInterval(vivoTimer); vivoTimer = null; return; }
   const E = SP.equipoPorId(t), p = (t.partidos || []).find(x => x.id === v.partido);
   const L = E[p?.local], V = E[p?.visita], gl = v.gl ?? 0, gv = v.gv ?? 0;
   const vs = p ? `${SP.esc(L?.nombre || '')} <b>${gl} - ${gv}</b> ${SP.esc(V?.nombre || '')}` : SP.esc(v.titulo || 'Transmisión en vivo');
   bar.innerHTML = `<span class="dot"></span><b>EN VIVO</b><span class="lb-vs">${vs}</span><span class="lb-go">Ver ›</span>`;
+  medirVivo();
   const id = SP.youtubeId(v.url), clave = id + '|' + v.url;
   $$('[data-vivo]').forEach(el => {
     // el reproductor solo se crea una vez (si se redibujara, el video se reiniciaría con cada actualización del marcador)
