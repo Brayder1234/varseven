@@ -119,7 +119,7 @@ SP.PROMOS = {
   inscritos: { activo: true, porcentaje: 10, domicilio: true, texto: 'Jugadores inscritos en la Seven Pro League' },
   mvp: { activo: true, porcentaje: null, texto: 'MVP de la fecha' },
   // oferta por fechas (hora de Colombia, ambos días incluidos): lanzamiento de la página web
-  lanzamiento: { activo: true, porcentaje: 20, desde: '2026-10-27', hasta: '2026-11-02', texto: 'Oferta de lanzamiento' },
+  lanzamiento: { activo: true, porcentaje: 20, desde: '2026-10-27', hasta: '2026-11-03', texto: 'Oferta de lanzamiento' },
 };
 SP.promos = () => { const p = SP.sitio?.promos || {}; return Object.fromEntries(Object.entries(SP.PROMOS).map(([k, v]) => [k, { ...v, ...(p[k] || {}) }])); };
 SP.DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -132,6 +132,14 @@ SP.ofertaHoy = () => {
   if (m.activo && +m.porcentaje > 0 && SP.hoyBogota().getDay() === +m.dia) op.push({ pct: +m.porcentaje, por: m.texto || `Descuento de los ${SP.DIAS[+m.dia]}` });
   if (l) op.push({ pct: +l.porcentaje, por: l.texto || 'Oferta de lanzamiento' });
   return op.sort((a, b) => b.pct - a.pct)[0] || null;
+};
+// anuncio de la oferta de lanzamiento: 'pronto' antes de empezar, 'activa' durante, null cuando ya terminó o está apagada
+SP.lanzamiento = () => {
+  const l = SP.promos().lanzamiento, h = SP.fechaHoy();
+  if (!l.activo || !(+l.porcentaje > 0) || (l.hasta && h > l.hasta)) return null;
+  const dia = iso => new Date(iso + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
+  return { l, pct: +l.porcentaje, fase: l.desde && h < l.desde ? 'pronto' : 'activa', desde: l.desde ? dia(l.desde) : '', hasta: l.hasta ? dia(l.hasta) : '',
+    ini: l.desde ? new Date(l.desde + 'T00:00:00-05:00') : null, fin: l.hasta ? new Date(l.hasta + 'T23:59:59-05:00') : null };
 };
 SP.descuentoHoy = () => SP.ofertaHoy()?.pct || 0;
 SP.menos = (precio, pct) => Math.round(precio * (1 - pct / 100) / 100) * 100;
@@ -262,7 +270,8 @@ SP.cargar('sitio', s => {
   if (!s) return;
   SP.sitio = s;
   for (const c of s.categorias || []) SP.CATS[c.id] = { nombre: c.nombre, code: c.codigo || '', sup: c.superficie || '' };
-  const av = (s.avisos || []).filter(Boolean);
+  const lz = SP.lanzamiento();
+  const av = [...(lz ? [`🔥 −${lz.pct}% en toda la tienda${lz.desde && lz.hasta ? ` · del ${lz.desde} al ${lz.hasta}` : ''}`] : []), ...(s.avisos || []).filter(Boolean)];
   $('#topbar').innerHTML = [...av, ...av, ...av, ...av].map(a => `<span>${SP.esc(a)}</span>`).join('');
   const gen = s.tienda?.enlace || SP.wa(s.tienda?.whatsapp, `Hola ${SP.marca()} 👋`);
   $$('[data-wa-general]').forEach(a => { a.href = gen; });

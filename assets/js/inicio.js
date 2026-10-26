@@ -128,4 +128,54 @@
 
   SP.pausarFuera($('#split'));
   SP.pausarFuera($('.ribbon'));
+
+  // ───────── oferta de lanzamiento: banner grande + ventana al entrar + cuenta regresiva ─────────
+  let reloj = null;
+  SP.cargar('sitio', st => {
+    if (!st) return;
+    const lz = SP.lanzamiento(), sec = $('#oferta');
+    if (!lz) { sec.hidden = true; return; }
+    const pronto = lz.fase === 'pronto';
+    const objetivo = pronto ? lz.ini : lz.fin;
+    const cuenta = () => {
+      let ms = Math.max(0, (objetivo ? objetivo - Date.now() : 0)), z = n => String(n).padStart(2, '0');
+      const d = Math.floor(ms / 864e5); ms %= 864e5;
+      return [[d, 'días'], [z(Math.floor(ms / 36e5)), 'horas'], [z(Math.floor(ms % 36e5 / 6e4)), 'min'], [z(Math.floor(ms % 6e4 / 1e3)), 'seg']].map(([n, t]) => `<div><b class="display">${n}</b><small>${t}</small></div>`).join('');
+    };
+    const titulo = pronto ? `Desde el ${esc(lz.desde)}` : '¡Ya empezó!';
+    const fechas = `Del ${esc(lz.desde)} al ${esc(lz.hasta)}`;
+    sec.hidden = false;
+    sec.innerHTML = `<div class="wrap of-in">
+      <div class="of-big display" aria-hidden="true"><span>−${lz.pct}%</span></div>
+      <div class="of-txt">
+        <p class="eyebrow">${esc(lz.l.texto || 'Oferta de lanzamiento')} · ${titulo}</p>
+        <h2 class="display">${lz.pct}% de descuento en <span class="grad">toda la tienda</span></h2>
+        <p class="lead">${fechas}. Celebramos el lanzamiento de la página con guayos, torretín y futsal a precio especial.</p>
+        <p class="of-cuenta-t">${pronto ? 'Empieza en' : 'Termina en'}</p>
+        <div class="of-cuenta" id="of-cuenta">${cuenta()}</div>
+        <a class="btn btn-primary of-btn" href="tienda.html">Ver la tienda <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div></div>`;
+    clearInterval(reloj);
+    reloj = setInterval(() => { const c = $('#of-cuenta'); if (c) c.innerHTML = cuenta(); }, 1000);
+
+    // ventana al entrar: una vez por visita
+    if (SP.store.get('sp:of-pop-' + (lz.l.desde || ''), false) && !location.hash.includes('oferta')) return;
+    try { if (sessionStorage.getItem('sp:of-pop')) return; sessionStorage.setItem('sp:of-pop', '1'); } catch { /* sin almacenamiento: se muestra */ }
+    const pop = document.createElement('div');
+    pop.className = 'of-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-modal', 'true'); pop.setAttribute('aria-label', 'Oferta de lanzamiento');
+    pop.innerHTML = `<div class="of-pop-scrim" data-x></div><div class="of-pop-card">
+      <button class="of-pop-x" data-x aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <p class="eyebrow">🔥 ${pronto ? 'Muy pronto' : 'Solo por esta semana'}</p>
+      <div class="of-pop-pct display">−${lz.pct}%</div>
+      <h3 class="display">En toda la tienda</h3>
+      <p>${fechas}.<br>Lanzamiento de la página de <b>Seven Pro Shop × VAR</b>.</p>
+      <a class="btn btn-primary" href="tienda.html">Quiero mi descuento <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <button class="of-pop-no" data-x>Ahora no</button></div>`;
+    const cerrar = () => { pop.classList.remove('on'); setTimeout(() => pop.remove(), 400); document.removeEventListener('keydown', tecla); };
+    const tecla = e => { if (e.key === 'Escape') cerrar(); };
+    pop.addEventListener('click', e => { if (e.target.closest('[data-x]')) cerrar(); });
+    document.addEventListener('keydown', tecla);
+    document.body.appendChild(pop);
+    setTimeout(() => pop.classList.add('on'), 700);
+  });
 })();
