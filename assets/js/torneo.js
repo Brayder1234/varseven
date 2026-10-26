@@ -9,13 +9,14 @@
   SP.cargar('torneo', t => {
     if (!t) { $('#ins').innerHTML = '<p class="empty">No pudimos cargar el torneo. Intenta de nuevo en un momento.</p>'; return; }
     T = t; E = SP.equipoPorId(t); J = SP.jugadorPorId(t);
-    hero(); inscripcion(); posiciones(); proximos(); resultados(); goleadores(); sanciones(); galeria();
+    hero(); inscripcion(); posiciones(); proximos(); resultados(); goleadores(); sanciones(); galeria(); medios(); promosTorneo();
     SP.revelar();
   });
   SP.cargar('sitio', s => {
     if (!s) return;
     $('#socials').innerHTML = SP.redesHTML(s.redes);
     $('#sponsors').innerHTML = SP.patrocinadoresHTML(s.patrocinadores);
+    promosTorneo();
     SP.revelar();
   });
 
@@ -38,8 +39,12 @@
         ${i.premios ? `<p class="lead">${esc(i.premios)}</p>` : ''}
         <ul class="ins-list">${[['Fechas', i.fechas], ['Cupos', i.cupos], ['Lugar', i.lugar], ['Horarios', (i.horarios || []).join(' · ')]]
           .filter(x => x[1]).map(([k, v]) => `<li><small>${k}</small><b>${esc(v)}</b></li>`).join('')}</ul>
+        <p class="cuenta-tit" id="ins-cuenta-tit" hidden>El torneo arranca en</p><div class="cuenta" id="ins-cuenta" hidden style="margin-bottom:24px"></div>
+        <p class="promo-nota" id="ins-promo" hidden></p>
         <a class="btn btn-wa" href="${esc(SP.wa(i.whatsapp, i.mensaje))}" target="_blank" rel="noopener">${ICON.wa.replace('<svg', '<svg width="20" height="20" fill="currentColor"')} Inscribir mi equipo</a>
       </div></div>`;
+    SP.cuenta($('#ins-cuenta'), i.inicio);
+    $('#ins-cuenta-tit').hidden = $('#ins-cuenta').hidden;
   }
 
   function posiciones() {
@@ -171,6 +176,18 @@
 
   // galería con visor
   // jugadores del partido de la última fecha (las fotos completas de cada partido van por enlace de Drive)
+  // beneficios de la tienda para jugadores (panel → Promociones)
+  function promosTorneo() {
+    if (!T) return;
+    const P = SP.promos(), ins = $('#ins-promo'), mvp = $('#mvp-promo');
+    if (ins) {
+      ins.hidden = !P.inscritos.activo;
+      ins.innerHTML = `🏷️ Si juegas el torneo: <b>${+P.inscritos.porcentaje ? P.inscritos.porcentaje + '% de descuento' : 'descuento'}</b> en la tienda cualquier día${P.inscritos.domicilio ? ' y <b>domicilio gratis</b>' : ''}.`;
+    }
+    mvp.hidden = !P.mvp.activo;
+    mvp.innerHTML = `⭐ Los MVP de la fecha tienen <b>${+P.mvp.porcentaje ? P.mvp.porcentaje + '% de descuento' : 'un descuento especial'}</b> en la tienda.`;
+  }
+
   function galeria() {
     fotos = (T.fotos || []).filter(f => f.url);
     const f = T.fotosFecha || SP.jugados(T).reduce((m, p) => Math.max(m, p.fecha), 0);
@@ -178,10 +195,33 @@
     $('#fotos').hidden = !fotos.length;
     $('#galeria').innerHTML = fotos.map((f, i) => `<button data-foto="${i}" class="r" style="--d:${(i % 4) * .05}s"><img src="${esc(f.url)}" alt="${esc(f.titulo || '')}" loading="lazy"><span>${esc(f.titulo || '')}</span></button>`).join('');
   }
+  // fotos y jugadas destacadas (panel → Fotos y videos): los videos de YouTube se ven en el visor
+  let medList = [];
+  function medios() {
+    medList = (T.medios || []).filter(m => m.url);
+    $('#medios').hidden = !medList.length;
+    $('#medios-grid').innerHTML = medList.map((m, i) => {
+      const id = m.tipo === 'video' ? SP.youtubeId(m.url) : '';
+      const img = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : m.tipo === 'video' ? '' : m.url;
+      return `<button data-medio="${i}" class="r ${m.tipo === 'video' ? 'es-video' : ''}" style="--d:${(i % 4) * .05}s">${img ? `<img src="${esc(img)}" alt="${esc(m.titulo || '')}" loading="lazy">` : '<div class="sin-mini">▶</div>'}${m.tipo === 'video' ? '<i class="play">▶</i>' : ''}<span>${esc(m.titulo || '')}</span></button>`;
+    }).join('');
+  }
+
   const lb = $('#lb');
-  const verFoto = i => { lbI = (i + fotos.length) % fotos.length; $('#lb-img').src = fotos[lbI].url; $('#lb-cap').textContent = fotos[lbI].titulo || ''; };
-  const ocultarFoto = () => { if (lb.hidden) return; lb.hidden = true; SP.unlock(); };
-  $('#galeria').addEventListener('click', e => { const b = e.target.closest('[data-foto]'); if (!b) return; verFoto(+b.dataset.foto); lb.hidden = false; SP.lock(); history.pushState({ foto: 1 }, '', location.pathname + '#fotos'); });
+  let lista = [];
+  const verFoto = i => {
+    lbI = (i + lista.length) % lista.length;
+    const m = lista[lbI], id = m.tipo === 'video' ? SP.youtubeId(m.url) : '';
+    $('.lb-img', lb).innerHTML = m.tipo === 'video'
+      ? (id ? `<div class="lb-video"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="${esc(m.titulo || 'Video')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+        : `<a class="btn btn-light" href="${esc(m.url)}" target="_blank" rel="noopener">Ver video ${ICON.ext}</a>`)
+      : `<img src="${esc(m.url)}" alt="">`;
+    $('#lb-cap').textContent = m.titulo || '';
+  };
+  const ocultarFoto = () => { if (lb.hidden) return; lb.hidden = true; $('.lb-img', lb).innerHTML = ''; SP.unlock(); };
+  const abrir = (l, i, hash) => { lista = l; verFoto(i); lb.hidden = false; SP.lock(); history.pushState({ foto: 1 }, '', location.pathname + hash); };
+  $('#galeria').addEventListener('click', e => { const b = e.target.closest('[data-foto]'); if (b) abrir(fotos, +b.dataset.foto, '#fotos'); });
+  $('#medios-grid').addEventListener('click', e => { const b = e.target.closest('[data-medio]'); if (b) abrir(medList, +b.dataset.medio, '#medios'); });
   lb.addEventListener('click', e => {
     const b = e.target.closest('[data-lb]');
     if (b?.dataset.lb === 'cerrar' || e.target === lb || e.target.classList.contains('lb-img')) history.state?.foto ? history.back() : ocultarFoto();

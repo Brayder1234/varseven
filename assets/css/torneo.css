@@ -153,6 +153,15 @@ button.partido:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px 
 .lb-prev, .lb-next { top: 50%; margin-top: -22px; }
 .lb-prev { left: 12px; } .lb-next { right: 12px; }
 
+.promo-nota { margin: 0 0 18px; padding: 12px 16px; border-radius: 12px; background: rgba(63, 224, 240, .1); box-shadow: inset 0 0 0 1px rgba(63, 224, 240, .3); font-size: 15px; }
+.promo-nota b { color: var(--cyan); }
+.galeria .es-video .play { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin: -29px 0 0 -29px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 46, 77, .92); font-style: normal; font-size: 22px; padding-left: 4px; box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .7); transition: transform .4s var(--spring); }
+.galeria .es-video:hover .play { transform: scale(1.12); }
+.galeria .es-video span { opacity: 1; }
+.galeria .sin-mini { aspect-ratio: 16 / 9; display: grid; place-items: center; background: var(--n800); font-size: 30px; }
+.lb-video { width: min(100%, 1100px); aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; }
+.lb-video iframe { width: 100%; height: 100%; border: 0; }
+
 @media (max-width: 900px) {
   .t-hero-in { grid-template-columns: 1fr; }
   .t-hero-logo { width: 110px; }

@@ -34,8 +34,11 @@
   </section>
 
   <div class="subnav"><div class="wrap"><nav id="subnav" aria-label="Secciones del torneo">
-    <a href="#inscripcion">Inscripción</a><a href="#posiciones">Posiciones</a><a href="#partidos">Próximos</a><a href="#resultados">Resultados</a><a href="#goleadores">Goleadores</a><a href="#sanciones">Sanciones</a><a href="#fotos">Jugadores</a><a href="#redes">Redes</a>
+    <a href="#inscripcion">Inscripción</a><a href="#posiciones">Posiciones</a><a href="#partidos">Próximos</a><a href="#resultados">Resultados</a><a href="#goleadores">Goleadores</a><a href="#sanciones">Sanciones</a><a href="#fotos">Jugadores</a><a href="#medios">Fotos y videos</a><a href="#redes">Redes</a>
   </nav></div></div>
+
+  <!-- partido en vivo (panel → En vivo) -->
+  <div class="wrap" id="envivo" data-vivo hidden style="padding-top:clamp(40px,6vw,70px)"></div>
 
   <!-- inscripción: apartado propio, separado de las estadísticas -->
   <section class="sec" id="inscripcion">
@@ -89,7 +92,16 @@
     <div class="wrap">
       <div class="head"><div class="r"><p class="eyebrow" id="jug-fecha">Última fecha</p><h2 class="display h2">Jugadores <span class="grad">del partido</span></h2></div>
         <p class="lead r">Los mejores de cada partido. Las fotos completas de cada juego están en el botón “Fotos del partido” de cada resultado.</p></div>
+      <p class="promo-nota" id="mvp-promo" hidden></p>
       <div class="galeria" id="galeria"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="medios" style="padding-top:0" hidden>
+    <div class="wrap">
+      <div class="head"><div class="r"><p class="eyebrow">Galería</p><h2 class="display h2">Fotos y <span class="grad">jugadas destacadas</span></h2></div>
+        <p class="lead r">Lo mejor de cada fecha en fotos y video.</p></div>
+      <div class="galeria" id="medios-grid"></div>
     </div>
   </section>
 

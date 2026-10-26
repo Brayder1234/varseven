@@ -108,6 +108,23 @@ SP.descansa = (t, fecha) => {
 // ───────── producto: tarjeta del catálogo ─────────
 // descuento real: La Gambeta suele poner un "antes" casi igual al precio; solo se muestra si baja 10 % o más
 SP.rebaja = (precio, antes) => antes > precio && (1 - precio / antes) >= .1 ? Math.round((1 - precio / antes) * 100) : 0;
+// niño = todas sus tallas son de niño (hasta 37,5 COL); sin tallas, se respeta la marca del producto
+SP.esNino = p => {
+  const t = (p.colores || []).flatMap(c => c.tallas || []).map(x => parseFloat(x.col)).filter(n => !isNaN(n));
+  return t.length ? Math.max(...t) <= 37.5 : !!p.nino;
+};
+// ───────── promociones (se configuran en el panel → Promociones) ─────────
+SP.PROMOS = {
+  martes: { activo: true, dia: 2, porcentaje: 10, texto: 'Martes de descuento' },
+  inscritos: { activo: true, porcentaje: 10, domicilio: true, texto: 'Jugadores inscritos en la Seven Pro League' },
+  mvp: { activo: true, porcentaje: null, texto: 'MVP de la fecha' },
+};
+SP.promos = () => { const p = SP.sitio?.promos || {}; return Object.fromEntries(Object.entries(SP.PROMOS).map(([k, v]) => [k, { ...v, ...(p[k] || {}) }])); };
+SP.DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+SP.hoyBogota = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' }));
+// descuento automático del día (por defecto, los martes)
+SP.descuentoHoy = () => { const m = SP.promos().martes; return m.activo && +m.porcentaje > 0 && SP.hoyBogota().getDay() === +m.dia ? +m.porcentaje : 0; };
+SP.menos = (precio, pct) => Math.round(precio * (1 - pct / 100) / 100) * 100;
 SP.CATS = { guayos: { nombre: 'Guayos', code: 'FG', sup: 'Césped natural' }, torretin: { nombre: 'Torretín', code: 'TF', sup: 'Grama sintética' }, futsal: { nombre: 'Futsal', code: 'IC', sup: 'Cancha cubierta' } };
 SP.urlProducto = (p, color) => `producto.html?id=${encodeURIComponent(p.id)}${color ? '&c=' + encodeURIComponent(color) : ''}`;
 SP.tarjeta = (p, i = 0) => {
@@ -117,14 +134,14 @@ SP.tarjeta = (p, i = 0) => {
     : `<img class="foto" src="${SP.esc(SP.img(c.fotos?.[0], 500))}" alt="${SP.esc(p.marca + ' ' + p.nombre)}" loading="lazy" decoding="async">`;
   const n = p.colores?.length || 0;
   const dots = (p.colores || []).slice(0, 4).map(x => `<i style="background:${SP.esc(x.hex?.[0] || '#888')}"></i>`).join('');
-  const reb = SP.rebaja(p.precio, p.antes);
-  const tags = [p.nuevo && '<span class="nuevo">Nuevo</span>', reb >= 15 && `<span class="oferta">-${reb}%</span>`, p.nino && '<span class="nino">Niño</span>'].filter(Boolean).join('');
+  const reb = SP.rebaja(p.precio, p.antes), hoy = SP.descuentoHoy();
+  const tags = [p.nuevo && '<span class="nuevo">Nuevo</span>', hoy ? `<span class="oferta">-${hoy}% hoy</span>` : reb >= 15 && `<span class="oferta">-${reb}%</span>`, SP.esNino(p) && '<span class="nino">Niño</span>'].filter(Boolean).join('');
   return `<article class="pcard r" style="--g:${SP.esc(g)};--d:${(i % 4) * .06}s">
     <div class="pcard-media">${foto}${tags ? `<div class="tag">${tags}</div>` : ''}<span class="sup-code">${SP.CATS[p.cat]?.code || ''}</span></div>
     <div class="pcard-body">
       <p class="pcard-brand"><span>${SP.esc(p.marca)}</span><span>${SP.esc(SP.CATS[p.cat]?.nombre || '')}</span></p>
       <h3 class="pcard-name">${SP.esc(p.nombre)}</h3>
-      <div class="pcard-foot"><p class="price">${reb ? `<s>${SP.fmt(p.antes)}</s>` : ''}${SP.fmt(p.precio)}</p>
+      <div class="pcard-foot"><p class="price">${hoy ? `<s>${SP.fmt(p.precio)}</s>${SP.fmt(SP.menos(p.precio, hoy))}` : `${reb ? `<s>${SP.fmt(p.antes)}</s>` : ''}${SP.fmt(p.precio)}`}</p>
         <span class="dots">${dots}${n > 4 ? `+${n - 4}` : ''}</span></div>
     </div>
     <a class="pcard-hit" href="${SP.urlProducto(p)}" aria-label="${SP.esc(`${p.marca} ${p.nombre}, ${SP.fmt(p.precio)}`)}"></a>
@@ -155,6 +172,7 @@ const PAGINAS = [['inicio', 'index.html', 'Inicio'], ['torneo', 'torneo.html', '
 const pagina = document.body.dataset.page;
 document.body.insertAdjacentHTML('afterbegin', `
   <div class="topbar" aria-hidden="true"><div class="topbar-track" id="topbar"></div></div>
+  <a class="live-bar" id="live-bar" href="torneo.html#envivo" hidden></a>
   <header class="nav" id="nav">
     <div class="wrap nav-in">
       <a class="brand" href="index.html" aria-label="Seven Pro League × VAR Tienda Deportiva — inicio">
@@ -198,6 +216,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <div class="bag-head"><h2 class="display">Tu bolsa</h2><button class="icon-btn" data-close-bag aria-label="Cerrar la bolsa">${SP.ICON.close}</button></div>
       <div class="bag-list" id="bag-list"></div>
       <div class="bag-foot" id="bag-foot">
+        <div class="bag-promos" id="bag-promos"></div>
         <div class="bag-total"><span>Total</span><b id="bag-total">$0</b></div>
         <p class="bag-note">Te confirmamos disponibilidad, pago y entrega por WhatsApp.</p>
         <a class="btn btn-wa btn-block" id="bag-send" href="#" target="_blank" rel="noopener">${SP.ICON.wa.replace('<svg', '<svg width="20" height="20" fill="currentColor"')} Enviar pedido</a>
@@ -226,6 +245,8 @@ addEventListener('scroll', () => {
 
 // sitio: avisos, WhatsApp general y redes del pie
 SP.sitio = null;
+// nombre con el que se saluda en WhatsApp: es una alianza, no solo la tienda
+SP.marca = () => SP.sitio?.tienda?.nombre || 'Seven Pro × VAR';
 SP.alSitio = [];
 SP.cargar('sitio', s => {
   if (!s) return;
@@ -233,7 +254,7 @@ SP.cargar('sitio', s => {
   for (const c of s.categorias || []) SP.CATS[c.id] = { nombre: c.nombre, code: c.codigo || '', sup: c.superficie || '' };
   const av = (s.avisos || []).filter(Boolean);
   $('#topbar').innerHTML = [...av, ...av, ...av, ...av].map(a => `<span>${SP.esc(a)}</span>`).join('');
-  const gen = s.tienda?.enlace || SP.wa(s.tienda?.whatsapp, `Hola ${s.tienda?.nombre || 'VAR'} 👋`);
+  const gen = s.tienda?.enlace || SP.wa(s.tienda?.whatsapp, `Hola ${SP.marca()} 👋`);
   $$('[data-wa-general]').forEach(a => { a.href = gen; });
   $('#foot-redes').innerHTML = (s.redes || []).map(r => `<li><a href="${SP.esc(r.url)}" target="_blank" rel="noopener">${SP.esc(r.usuario || r.red)}</a></li>`).join('');
   SP.alSitio.forEach(f => f(s));
@@ -252,8 +273,20 @@ SP.agregar = it => {
   guardar(); pintarBolsa(); bump();
 };
 function bump() { bagN.classList.remove('bump'); void bagN.offsetWidth; bagN.classList.add('bump'); }
+// beneficios que el cliente marca en la bolsa; la tienda los verifica por WhatsApp
+let benef = SP.store.get('sp:beneficios', { inscrito: false, equipo: '', mvp: false });
+function descuentoBolsa() {
+  const P = SP.promos(), op = [];
+  const hoy = SP.descuentoHoy();
+  if (hoy) op.push({ pct: hoy, por: P.martes.texto || `Descuento de los ${SP.DIAS[+P.martes.dia]}` });
+  if (benef.inscrito && P.inscritos.activo && +P.inscritos.porcentaje) op.push({ pct: +P.inscritos.porcentaje, por: 'Jugador inscrito en la Seven Pro League' });
+  if (benef.mvp && P.mvp.activo && +P.mvp.porcentaje) op.push({ pct: +P.mvp.porcentaje, por: 'MVP de la fecha' });
+  return op.sort((a, b) => b.pct - a.pct)[0] || null; // los descuentos no se suman: se aplica el mayor
+}
 function pintarBolsa() {
-  const n = items.reduce((s, i) => s + i.cant, 0), total = items.reduce((s, i) => s + i.precio * i.cant, 0);
+  const n = items.reduce((s, i) => s + i.cant, 0), sub = items.reduce((s, i) => s + i.precio * i.cant, 0);
+  const P = SP.promos(), d = descuentoBolsa(), total = d ? SP.menos(sub, d.pct) : sub;
+  const domicilio = benef.inscrito && P.inscritos.activo && P.inscritos.domicilio;
   bagN.textContent = n; bagN.classList.toggle('on', n > 0);
   $('#bag-foot').hidden = !n;
   $('#bag-list').innerHTML = !n
@@ -263,11 +296,27 @@ function pintarBolsa() {
         <div><h3>${SP.esc(i.nombre)}</h3><p class="meta">Talla ${SP.esc(i.talla)} · ${SP.esc(i.colorNombre || '')}</p>
           <div class="bag-row"><div class="qty"><button data-q="${k}" data-d="-1" aria-label="Quitar uno">${SP.ICON.minus}</button><span>${i.cant}</span><button data-q="${k}" data-d="1" aria-label="Agregar uno">${SP.ICON.plus}</button></div><b class="tech">${SP.fmt(i.precio * i.cant)}</b></div>
           <button class="rm" data-rm="${k}">Quitar</button></div></div>`).join('');
+  $('#bag-promos').innerHTML = `
+    ${P.inscritos.activo ? `<label class="bp"><input type="checkbox" data-benef="inscrito" ${benef.inscrito ? 'checked' : ''}><span><b>Juego en la Seven Pro League</b><small>${+P.inscritos.porcentaje ? `${P.inscritos.porcentaje}% de descuento` : 'Beneficio de jugador'}${P.inscritos.domicilio ? ' + domicilio gratis' : ''}</small></span></label>
+      ${benef.inscrito ? `<input class="bp-eq" data-benef="equipo" placeholder="¿En qué equipo juegas?" value="${SP.esc(benef.equipo)}">` : ''}` : ''}
+    ${P.mvp.activo ? `<label class="bp"><input type="checkbox" data-benef="mvp" ${benef.mvp ? 'checked' : ''}><span><b>Soy MVP de la fecha</b><small>${+P.mvp.porcentaje ? `${P.mvp.porcentaje}% de descuento` : 'Descuento especial que te confirmamos por WhatsApp'}</small></span></label>` : ''}
+    <div class="bp-res">${d ? `<span>Subtotal <s>${SP.fmt(sub)}</s></span><span class="ok">−${d.pct}% · ${SP.esc(d.por)}</span>` : ''}${domicilio ? '<span class="ok">Domicilio gratis</span>' : ''}</div>`;
   $('#bag-total').textContent = SP.fmt(total);
   const t = SP.sitio?.tienda || {};
   const lineas = items.map(i => `• ${i.nombre} — ${i.colorNombre || ''}\n   Talla ${i.talla} · ${i.cant} ${i.cant > 1 ? 'pares' : 'par'} · ${SP.fmt(i.precio * i.cant)}`).join('\n');
-  $('#bag-send').href = SP.wa(t.whatsapp || '573112204194', `Hola ${t.nombre || 'VAR Tienda Deportiva'} 👋, quiero hacer este pedido:\n\n${lineas}\n\nTotal: ${SP.fmt(total)}\n\n¿Me confirman disponibilidad, pago y entrega? ⚽`);
+  const extra = [
+    benef.inscrito && `✅ Soy jugador inscrito en la Seven Pro League${benef.equipo ? ` (equipo: ${benef.equipo})` : ''}`,
+    benef.mvp && `⭐ Soy MVP de la fecha${+P.mvp.porcentaje ? '' : ' (descuento por confirmar)'}`,
+  ].filter(Boolean).join('\n');
+  const cuentas = d ? `Subtotal: ${SP.fmt(sub)}\nDescuento ${d.pct}% (${d.por}): −${SP.fmt(sub - total)}\nTotal: ${SP.fmt(total)}` : `Total: ${SP.fmt(total)}`;
+  $('#bag-send').href = SP.wa(t.whatsapp || '573112204194', `Hola ${SP.marca()} 👋, quiero hacer este pedido:\n\n${lineas}\n\n${extra ? extra + '\n\n' : ''}${cuentas}${domicilio ? '\nDomicilio: gratis (jugador inscrito)' : ''}\n\n¿Me confirman disponibilidad, pago y entrega? ⚽`);
 }
+$('#bag-promos').addEventListener('input', e => {
+  const el = e.target.closest('[data-benef]'); if (!el) return;
+  benef[el.dataset.benef] = el.type === 'checkbox' ? el.checked : el.value;
+  SP.store.set('sp:beneficios', benef);
+  if (el.type === 'checkbox') pintarBolsa(); else { const y = el.selectionStart; pintarBolsa(); const n = $('.bp-eq'); n?.focus(); n?.setSelectionRange(y, y); }
+});
 $('#bag-list').addEventListener('click', e => {
   const q = e.target.closest('[data-q]'), rm = e.target.closest('[data-rm]');
   if (q) { const it = items[+q.dataset.q]; it.cant += +q.dataset.d; if (it.cant < 1) items.splice(+q.dataset.q, 1); }
@@ -295,6 +344,59 @@ SP.toast = (txt, conBolsa = true) => {
   const t = $('#toast'); t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200);
 };
 $('#toast-btn').addEventListener('click', () => { $('#toast').classList.remove('show'); SP.abrirBolsa(); });
+
+// ───────── partido en vivo (panel → En vivo) ─────────
+// la barra roja sale en todas las páginas; la tarjeta grande en los lugares con [data-vivo]
+SP.youtubeId = u => (String(u || '').match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/) || [])[1] || '';
+let vivoTimer = null, vivoClave = '';
+function pintarVivo(t) {
+  const v = t?.envivo, bar = $('#live-bar');
+  const on = !!(v && v.activo && (v.url || v.partido));
+  bar.hidden = !on;
+  $$('[data-vivo]').forEach(el => { el.hidden = !on; });
+  if (!on) { clearInterval(vivoTimer); vivoTimer = null; return; }
+  const E = SP.equipoPorId(t), p = (t.partidos || []).find(x => x.id === v.partido);
+  const L = E[p?.local], V = E[p?.visita], gl = v.gl ?? 0, gv = v.gv ?? 0;
+  const vs = p ? `${SP.esc(L?.nombre || '')} <b>${gl} - ${gv}</b> ${SP.esc(V?.nombre || '')}` : SP.esc(v.titulo || 'Transmisión en vivo');
+  bar.innerHTML = `<span class="dot"></span><b>EN VIVO</b><span class="lb-vs">${vs}</span><span class="lb-go">Ver ›</span>`;
+  const id = SP.youtubeId(v.url), clave = id + '|' + v.url;
+  $$('[data-vivo]').forEach(el => {
+    // el reproductor solo se crea una vez (si se redibujara, el video se reiniciaría con cada actualización del marcador)
+    if (el.dataset.clave !== clave) {
+      el.dataset.clave = clave;
+      el.innerHTML = `<div class="vivo"><div class="vivo-info"><p class="vivo-tag"><span class="dot"></span>EN VIVO <small data-v="nota"></small></p><div class="vivo-marcador" data-v="marcador"></div>
+        ${v.url ? `<a class="btn btn-light" href="${SP.esc(v.url)}" target="_blank" rel="noopener">${SP.ICON.youtube.replace('<svg', '<svg width="20" height="20" fill="currentColor"')} Ver en YouTube</a>` : ''}</div>
+        ${id ? `<div class="vivo-video"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=0&rel=0" title="Transmisión en vivo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>` : ''}</div>`;
+    }
+    $('[data-v="nota"]', el).textContent = v.nota ? '· ' + v.nota : '';
+    $('[data-v="marcador"]', el).innerHTML = p ? `<span class="ve"><img src="${SP.esc(L?.escudo)}" alt="">${SP.esc(L?.nombre || '')}</span><b class="display">${gl} : ${gv}</b><span class="ve"><img src="${SP.esc(V?.escudo)}" alt="">${SP.esc(V?.nombre || '')}</span>`
+      : `<span class="ve">${SP.esc(v.titulo || 'Partido de la Seven Pro League')}</span>`;
+  });
+  // mientras haya partido en vivo, el marcador se actualiza solo cada 30 s
+  if (!vivoTimer) vivoTimer = setInterval(() => {
+    if (document.hidden) return;
+    fetch(`${SP.API}/api/torneo`, { cache: 'no-cache' }).then(r => r.json()).then(nt => { SP.store.set('sp:torneo', nt); pintarVivo(nt); SP.alVivo.forEach(f => f(nt)); }).catch(() => {});
+  }, 30000);
+}
+SP.alVivo = [];
+SP.cargar('torneo', pintarVivo);
+
+// ───────── conteo regresivo (inscripción → fecha de inicio) ─────────
+// la fecha del panel es hora de Colombia (UTC−5)
+SP.cuenta = (el, iso) => {
+  if (!el) return;
+  clearInterval(el._t);
+  const fin = iso ? new Date(iso.length <= 16 ? iso + ':00-05:00' : iso).getTime() : NaN;
+  if (!fin || isNaN(fin) || fin <= Date.now()) { el.hidden = true; return; }
+  el.hidden = false;
+  const tick = () => {
+    const s = Math.max(0, Math.floor((fin - Date.now()) / 1000));
+    if (!s) { clearInterval(el._t); el.hidden = true; return; }
+    el.innerHTML = [[Math.floor(s / 86400), 'días'], [Math.floor(s / 3600) % 24, 'horas'], [Math.floor(s / 60) % 60, 'min'], [s % 60, 'seg']]
+      .map(([n, t]) => `<span><b>${String(n).padStart(2, '0')}</b><small>${t}</small></span>`).join('');
+  };
+  tick(); el._t = setInterval(tick, 1000);
+};
 
 addEventListener('resize', () => $$('.tabs').forEach(SP.pildora));
 document.fonts?.ready.then(() => $$('.tabs').forEach(SP.pildora));

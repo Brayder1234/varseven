@@ -4,19 +4,37 @@
   const { $, $$, esc } = SP;
   const POR_PAGINA = 24;
   const qs = new URLSearchParams(location.search);
-  const st = { cat: qs.get('cat') || 'todos', marca: qs.get('marca') || 'todas', q: qs.get('q') || '', nino: qs.get('nino') === '1', orden: qs.get('orden') || 'nuevo' };
+  const st = { cat: qs.get('cat') || 'todos', marca: qs.get('marca') || 'todas', q: qs.get('q') || '', orden: qs.get('orden') || 'nuevo' };
   const claveVista = 'sp:vista:' + location.search;
   let mostrar = +sessionStorage.getItem(claveVista) || POR_PAGINA;
   let P = [], CATS = Object.entries(SP.CATS).map(([id, c]) => ({ id, ...c }));
   const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-  $('#q').value = st.q; $('#nino').checked = st.nino; $('#orden').value = st.orden;
+  $('#q').value = st.q; $('#orden').value = st.orden;
+  // pestaña Niños: los modelos con tallas de niño salen de su categoría y van todos aquí
+  const NINOS = { id: 'ninos', nombre: 'Niños', code: '' };
+  const enPestana = (p, cat) => cat === 'todos' || (cat === 'ninos' ? SP.esNino(p) : p.cat === cat && !SP.esNino(p));
 
   SP.cargar('sitio', s => {
     if (s?.categorias?.length) CATS = s.categorias.map(c => ({ id: c.id, nombre: c.nombre, code: c.codigo, sup: c.superficie }));
     pintarTabs();
     embajadores(s?.embajadores);
+    pintarPromos();
+    if (P.length) pintar();
   });
+  // promociones (panel → Promociones): martes, jugadores inscritos y MVP de la fecha
+  function pintarPromos() {
+    const P = SP.promos(), hoy = SP.descuentoHoy(), dia = SP.DIAS[+P.martes.dia] || 'martes';
+    const pi = +P.inscritos.porcentaje, pm = +P.mvp.porcentaje;
+    const l = [
+      P.martes.activo && +P.martes.porcentaje && { on: !!hoy, big: `-${P.martes.porcentaje}%`, t: hoy ? `¡Hoy es ${dia} de descuento!` : `Todos los ${dia}`, s: hoy ? 'El precio con descuento ya aparece en cada guayo.' : `${P.martes.porcentaje}% de descuento en toda la tienda.` },
+      P.inscritos.activo && { big: pi ? `${pi}%` : '✓', t: '¿Juegas la Seven Pro League?', s: `${pi ? pi + '% de descuento' : 'Descuento'} cualquier día${P.inscritos.domicilio ? ' + domicilio gratis' : ''}. Márcalo en la bolsa.` },
+      P.mvp.activo && { big: 'MVP', t: 'MVP de la fecha', s: `${pm ? pm + '% de descuento' : 'Descuento especial'} para los mejores de cada fecha. Márcalo en la bolsa.` },
+    ].filter(Boolean);
+    $('#promos').innerHTML = l.map((x, i) => `<div class="promo ${x.on ? 'on' : ''} r" style="--d:${i * .07}s"><b class="display">${esc(x.big)}</b><div><h3>${esc(x.t)}</h3><p>${esc(x.s)}</p></div></div>`).join('');
+    $('.promos-sec').hidden = !l.length;
+    SP.revelar($('#promos'));
+  }
   function embajadores(lista) {
     const l = (lista || []).filter(x => x.visible !== false && x.foto);
     $('#embajadores').hidden = !l.length;
@@ -33,18 +51,18 @@
   if (!P.length) $('#grid').innerHTML = Array.from({ length: 8 }, () => '<div class="sk" style="aspect-ratio:1/1.25"></div>').join('');
 
   function pintarTabs() {
-    const n = c => P.filter(p => c === 'todos' || p.cat === c).length;
+    const n = c => P.filter(p => enPestana(p, c)).length;
     // una categoría sin productos todavía no se muestra
-    const visibles = P.length ? CATS.filter(c => n(c.id) || st.cat === c.id) : CATS;
+    const visibles = (P.length ? [...CATS, NINOS].filter(c => n(c.id) || st.cat === c.id) : CATS);
     $('#tabs').innerHTML = '<span class="tabs-pill"></span>' + [{ id: 'todos', nombre: 'Todos' }, ...visibles]
       .map(c => `<button role="tab" data-cat="${esc(c.id)}" aria-selected="${st.cat === c.id}">${esc(c.nombre)}${P.length ? `<sup>${n(c.id)}</sup>` : ''}</button>`).join('');
-    $('#hero-cats').innerHTML = visibles.map(c => `<a href="?cat=${esc(c.id)}">${esc(c.nombre)} <b>${esc(c.code || '')}</b></a>`).join('');
+    $('#hero-cats').innerHTML = visibles.map(c => `<a href="?cat=${esc(c.id)}">${esc(c.nombre)}${c.code ? ` <b>${esc(c.code)}</b>` : ''}</a>`).join('');
     requestAnimationFrame(() => SP.pildora($('#tabs')));
   }
 
   function filtrados() {
     const q = norm(st.q).split(/\s+/).filter(Boolean);
-    let l = P.filter(p => (st.cat === 'todos' || p.cat === st.cat) && (st.marca === 'todas' || p.marca === st.marca) && (!st.nino || p.nino)
+    let l = P.filter(p => enPestana(p, st.cat) && (st.marca === 'todas' || p.marca === st.marca)
       && q.every(w => norm(`${p.marca} ${p.nombre} ${SP.CATS[p.cat]?.nombre} ${(p.colores || []).map(c => c.nombre).join(' ')}`).includes(w)));
     if (st.orden === 'asc') l = [...l].sort((a, b) => a.precio - b.precio);
     else if (st.orden === 'desc') l = [...l].sort((a, b) => b.precio - a.precio);
@@ -54,7 +72,7 @@
 
   function pintar(inicial = false) {
     // marcas disponibles en la categoría actual
-    const base = P.filter(p => st.cat === 'todos' || p.cat === st.cat);
+    const base = P.filter(p => enPestana(p, st.cat));
     const marcas = [...new Set(base.map(p => p.marca))].sort((a, b) => base.filter(p => p.marca === b).length - base.filter(p => p.marca === a).length);
     if (st.marca !== 'todas' && !marcas.includes(st.marca)) st.marca = 'todas';
     $('#marcas').innerHTML = [['todas', 'Todas las marcas'], ...marcas.map(m => [m, m])].map(([k, t]) => `<button class="chip" data-marca="${esc(k)}" aria-pressed="${st.marca === k}">${esc(t)}</button>`).join('');
@@ -81,7 +99,6 @@
     if (st.cat !== 'todos') u.set('cat', st.cat);
     if (st.marca !== 'todas') u.set('marca', st.marca);
     if (st.q) u.set('q', st.q);
-    if (st.nino) u.set('nino', '1');
     if (st.orden !== 'nuevo') u.set('orden', st.orden);
     history.replaceState(null, '', location.pathname + (u.toString() ? '?' + u : ''));
     pintar();
@@ -90,12 +107,11 @@
 
   $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) aplicar({ cat: b.dataset.cat }); });
   $('#marcas').addEventListener('click', e => { const b = e.target.closest('[data-marca]'); if (b) aplicar({ marca: b.dataset.marca }, false); });
-  $('#nino').addEventListener('change', e => aplicar({ nino: e.target.checked }, false));
   $('#orden').addEventListener('change', e => aplicar({ orden: e.target.value }, false));
   let tq; $('#q').addEventListener('input', e => { clearTimeout(tq); tq = setTimeout(() => aplicar({ q: e.target.value.trim() }, false), 220); });
   document.addEventListener('click', e => {
     if (e.target.closest('#mas')) { mostrar += POR_PAGINA; pintar(); }
-    if (e.target.closest('#limpiar')) { $('#q').value = ''; $('#nino').checked = false; aplicar({ cat: 'todos', marca: 'todas', q: '', nino: false }); }
+    if (e.target.closest('#limpiar')) { $('#q').value = ''; aplicar({ cat: 'todos', marca: 'todas', q: '' }); }
     if (e.target.closest('.pcard-hit')) { sessionStorage.setItem('sp:vista:' + location.search, mostrar); sessionStorage.setItem('sp:vista:' + location.search + ':y', scrollY); }
   });
 

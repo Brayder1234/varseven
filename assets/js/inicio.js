@@ -43,6 +43,8 @@
         .filter(x => x[1]).map(([k, v, c]) => `<div class="${c || ''}"><small>${k}</small><b>${esc(v)}</b></div>`).join('');
       $('#insc-btn').href = SP.wa(ins.whatsapp, ins.mensaje);
       $('#insc-img').src = ins.flyer;
+      SP.cuenta($('#insc-cuenta'), ins.inicio);
+      $('#insc-cuenta-tit').hidden = $('#insc-cuenta').hidden;
     }
     SP.revelar();
   });
