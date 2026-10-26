@@ -18,122 +18,39 @@
 <link rel="stylesheet" href="assets/css/app.css">
 <link rel="stylesheet" href="assets/css/inicio.css">
 <link rel="stylesheet" href="assets/css/intro.css">
+<link rel="preload" as="image" href="assets/img/logos/seven-pro-league-hd.webp">
 <script>document.documentElement.classList.replace('no-js', 'js');
-/* apertura del estadio: una vez por visita (?intro=1 la fuerza para probar) */
+/* apertura con el logo: una vez por visita (?intro=1 la fuerza para probar) */
 try { document.documentElement.classList.add(sessionStorage.getItem('sp:intro') && !/[?&]intro=1/.test(location.search) ? 'intro-visto' : 'intro-on'); } catch (e) { document.documentElement.classList.add('intro-on'); }</script>
 <script src="assets/js/intro.js" defer></script>
 </head>
 <body data-page="inicio">
-<!-- apertura: estadio de noche → penalti → ¡GOL! (assets/js/intro.js) -->
-<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida al estadio">
-  <svg class="intro-stage" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id="in-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#01020F"/><stop offset=".45" stop-color="#0A1140"/><stop offset="1" stop-color="#0A1140"/></linearGradient>
-      <linearGradient id="in-cesped" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A4524"/><stop offset=".5" stop-color="#137A3B"/><stop offset="1" stop-color="#1E9A4C"/></linearGradient>
-      <linearGradient id="in-prof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#01020F" stop-opacity=".75"/><stop offset="1" stop-color="#01020F" stop-opacity=".05"/></linearGradient>
-      <pattern id="in-gente" width="14" height="11" patternUnits="userSpaceOnUse"><rect width="14" height="11" fill="#0B1036"/><circle cx="3.5" cy="3" r="2.6" fill="#2433E0"/><circle cx="10.5" cy="3.6" r="2.6" fill="#E9EDFF"/><circle cx="7" cy="8.6" r="2.6" fill="#3FE0F0"/><circle cx="0" cy="8.4" r="2.6" fill="#FF2E4D"/><circle cx="14" cy="8.4" r="2.6" fill="#FF2E4D"/></pattern>
-      <pattern id="in-gente2" width="18" height="13" patternUnits="userSpaceOnUse"><rect width="18" height="13" fill="#0A0E30"/><circle cx="4" cy="3.6" r="3.2" fill="#FFD54A"/><circle cx="13" cy="3.2" r="3.2" fill="#3B5BFF"/><circle cx="8.5" cy="9.6" r="3.2" fill="#F2F2F2"/><circle cx="0" cy="9.4" r="3.2" fill="#3FE0F0"/><circle cx="18" cy="9.4" r="3.2" fill="#3FE0F0"/></pattern>
-      <pattern id="in-red" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M0 0L9 9M9 0L0 9" stroke="#fff" stroke-opacity=".4" stroke-width=".9"/></pattern>
-      <linearGradient id="in-haz-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#bfe6ff" stop-opacity="0"/></linearGradient>
-      <radialGradient id="in-vin" cx=".5" cy=".55" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".7"/></radialGradient>
-      <radialGradient id="in-balon-g" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#e8ecf5"/><stop offset="1" stop-color="#9aa3b8"/></radialGradient>
-    </defs>
-    <rect width="1000" height="1000" fill="url(#in-cielo)"/>
-    <!-- techo y tribuna -->
-    <rect y="62" width="1000" height="30" fill="#05071F"/>
-    <g id="in-hinchas-a"><rect y="88" width="1000" height="138" fill="url(#in-gente)"/></g>
-    <rect y="222" width="1000" height="20" fill="#060925"/><rect y="231" width="1000" height="2" fill="#3FE0F0" opacity=".6"/>
-    <g id="in-hinchas-b"><rect y="238" width="1000" height="144" fill="url(#in-gente2)"/>
-      <g fill="#3FE0F0"><rect class="in-bandera" x="120" y="300" width="34" height="20"/><rect class="in-bandera" x="760" y="262" width="34" height="20" fill="#FFD54A"/></g>
-      <g><rect class="in-bandera" x="300" y="276" width="34" height="20" fill="#2433E0"/><rect class="in-bandera" x="610" y="318" width="34" height="20" fill="#FF2E4D"/><rect class="in-bandera" x="440" y="254" width="34" height="20" fill="#fff"/><rect class="in-bandera" x="880" y="330" width="34" height="20" fill="#3B5BFF"/></g>
-    </g>
-    <rect y="88" width="1000" height="294" fill="url(#in-prof)"/>
-    <!-- valla LED -->
-    <rect y="380" width="1000" height="30" fill="#040824"/><rect y="380" width="1000" height="1.5" fill="#3FE0F0" opacity=".5"/>
-    <g id="in-led"><text x="0" y="401" fill="#3FE0F0" font-family="Chakra Petch, sans-serif" font-size="16" font-weight="700" letter-spacing="3">SEVEN PRO LEAGUE × VAR ✦ SEVEN PRO SHOP ✦ SEVEN PRO LEAGUE × VAR ✦ SEVEN PRO SHOP ✦ SEVEN PRO LEAGUE × VAR ✦ SEVEN PRO SHOP ✦ SEVEN PRO LEAGUE × VAR ✦ SEVEN PRO SHOP ✦ </text></g>
-    <!-- cancha -->
-    <rect y="410" width="1000" height="590" fill="url(#in-cesped)"/>
-    <g fill="#fff" opacity=".05"><rect y="410" width="1000" height="22"/><rect y="452" width="1000" height="30"/><rect y="512" width="1000" height="40"/><rect y="598" width="1000" height="54"/><rect y="712" width="1000" height="72"/><rect y="868" width="1000" height="96"/></g>
-    <g fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3" stroke-linejoin="round"><path d="M0 470H1000" stroke-width="2.5"/><path d="M162 470L120 525H880L838 470"/><path d="M0 790H1000" stroke-width="3.5"/><path d="M0 790Q500 1010 1000 790"/></g>
-    <ellipse cx="500" cy="660" rx="7" ry="2.6" fill="#fff" opacity=".85"/>
-    <!-- arco: la red se mueve con el gol -->
-    <g transform="translate(612 398)"><g id="in-red-anim"><g transform="translate(-612 -398)">
-      <path d="M365 380L395 398V462L365 470ZM635 380L605 398V462L635 470ZM365 380H635L605 398H395Z M395 398H605V462H395Z" fill="url(#in-red)"/>
-      <path d="M395 398H605V462H395Z" fill="#fff" opacity=".04"/>
-      <path d="M365 380L395 398V462M635 380L605 398V462M395 462H605" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.5"/>
-    </g></g></g>
-    <!-- portero -->
-    <g transform="translate(500 470) scale(.38)"><g id="p"><g id="p-c">
-      <line x1="-13" y1="-80" x2="-26" y2="-4" stroke="#1b1b1b" stroke-width="15" stroke-linecap="round"/><line x1="13" y1="-80" x2="26" y2="-4" stroke="#1b1b1b" stroke-width="15" stroke-linecap="round"/>
-      <path d="M-36 0H-20M20 0H36" stroke="#FF2E4D" stroke-width="9" stroke-linecap="round"/>
-      <g transform="translate(-24 -140)"><g id="p-brazo-l" style="transform:rotate(55deg)"><line x1="0" y1="0" x2="0" y2="58" stroke="#C8F03A" stroke-width="13" stroke-linecap="round"/><circle cy="64" r="10" fill="#fff"/></g></g>
-      <g transform="translate(24 -140)"><g id="p-brazo-r" style="transform:rotate(-55deg)"><line x1="0" y1="0" x2="0" y2="58" stroke="#C8F03A" stroke-width="13" stroke-linecap="round"/><circle cy="64" r="10" fill="#fff"/></g></g>
-      <rect x="-27" y="-154" width="54" height="68" rx="14" fill="#C8F03A"/>
-      <text x="0" y="-104" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="900" font-size="30" fill="#0A0F2E">1</text>
-      <rect x="-25" y="-94" width="50" height="24" rx="7" fill="#111"/>
-      <circle cy="-174" r="18" fill="#a06a45"/><path d="M-18 -178a18 18 0 0 1 36 0c-8-5-14-6-18-4c-5-3-11-2-18 4z" fill="#140c08"/>
-    </g></g></g>
-    <!-- palos y travesaño -->
-    <path d="M365 470V380H635V470" fill="none" stroke="#fff" stroke-width="6.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <!-- cobrador (de perfil, mirando a la derecha) -->
-    <ellipse id="k-sombra" rx="36" ry="7" fill="#000" opacity=".4" style="transform:translate(334px,862px) scale(1)"/>
-    <g id="k" style="transform:translate(330px,860px) scale(1)"><g id="k-cuerpo">
-      <g transform="translate(0 -100)"><g class="k-tronco" style="transform:rotate(8deg)"><g transform="translate(0 100)">
-        <g transform="translate(4 -152)"><g id="k-brazo-l" style="transform:rotate(-30deg)"><line x1="0" y1="0" x2="0" y2="36" stroke="#6a4129" stroke-width="11" stroke-linecap="round"/><line x1="0" y1="0" x2="0" y2="13" stroke="#1a2390" stroke-width="16" stroke-linecap="round"/><g transform="translate(0 36)"><g id="k-ante-l" style="transform:rotate(-80deg)"><line x1="0" y1="0" x2="0" y2="30" stroke="#6a4129" stroke-width="10" stroke-linecap="round"/><circle cy="33" r="6" fill="#6a4129"/></g></g></g></g>
-      </g></g></g>
-      <g transform="translate(-3 -100)"><g id="k-muslo-l" style="transform:rotate(20deg)"><line x1="0" y1="0" x2="0" y2="52" stroke="#6a4129" stroke-width="16" stroke-linecap="round"/><g transform="translate(0 52)"><g id="k-pierna-l" style="transform:rotate(25deg)"><line x1="0" y1="0" x2="0" y2="44" stroke="#1a2390" stroke-width="14" stroke-linecap="round"/><path d="M-6 44L16 46" stroke="#a01229" stroke-width="10" stroke-linecap="round"/></g></g></g></g>
-      <g transform="translate(3 -100)"><g id="k-muslo-r" style="transform:rotate(-12deg)"><line x1="0" y1="0" x2="0" y2="52" stroke="#8B5A3C" stroke-width="16" stroke-linecap="round"/><g transform="translate(0 52)"><g id="k-pierna-r" style="transform:rotate(8deg)"><line x1="0" y1="0" x2="0" y2="44" stroke="#2433E0" stroke-width="14" stroke-linecap="round"/><path d="M-6 44L16 46" stroke="#FF2E4D" stroke-width="10" stroke-linecap="round"/></g></g></g></g>
-      <rect x="-17" y="-117" width="34" height="31" rx="9" fill="#F2F4FF"/>
-      <g transform="translate(0 -100)"><g class="k-tronco" style="transform:rotate(8deg)"><g transform="translate(0 100)">
-        <line x1="0" y1="-108" x2="6" y2="-150" stroke="#2433E0" stroke-width="36" stroke-linecap="round"/>
-        <line x1="-12" y1="-110" x2="-7" y2="-148" stroke="#3FE0F0" stroke-width="4" stroke-linecap="round"/>
-        <text x="-6" y="-118" transform="rotate(-8 -6 -118)" font-family="Barlow Condensed, sans-serif" font-style="italic" font-weight="900" font-size="26" fill="#fff" text-anchor="middle">7</text>
-        <circle cx="12" cy="-180" r="16" fill="#8B5A3C"/><path d="M-3 -183a15.5 15.5 0 0 1 30 -3c-6-3-12-2-16 2c-5-4-10-3-14 1z" fill="#140c08"/>
-        <g transform="translate(6 -152)"><g id="k-brazo-r" style="transform:rotate(25deg)"><line x1="0" y1="0" x2="0" y2="36" stroke="#8B5A3C" stroke-width="11" stroke-linecap="round"/><line x1="0" y1="0" x2="0" y2="13" stroke="#2433E0" stroke-width="16" stroke-linecap="round"/><g transform="translate(0 36)"><g id="k-ante-r" style="transform:rotate(-80deg)"><line x1="0" y1="0" x2="0" y2="30" stroke="#8B5A3C" stroke-width="10" stroke-linecap="round"/><circle cy="33" r="6" fill="#8B5A3C"/></g></g></g></g>
-      </g></g></g>
-    </g></g>
-    <!-- balón -->
-    <ellipse id="b-sombra" rx="13" ry="4" fill="#000" opacity=".45" style="transform:translate(503px,671px)"/>
-    <g id="b" style="transform:translate(500px,660px)"><g id="b-gira">
-      <circle r="11" fill="url(#in-balon-g)" stroke="#0A0F2E" stroke-width=".8"/>
-      <path d="M0-3.6L3.4-1.1L2.1 2.9H-2.1L-3.4-1.1Z" fill="#0A0F2E"/>
-      <path d="M-10.6-3L-7.8-1.6L-8.6 2.4L-10.9 2.6ZM10.6-3L7.8-1.6L8.6 2.4L10.9 2.6ZM-3.2 10.4L-2.2 7.2H2.2L3.2 10.4ZM-5.4-9.6L-2.4-8.2L2.4-8.2L5.4-9.6L0-11Z" fill="#0A0F2E"/>
-      <path d="M0-3.6V-8.2M3.4-1.1L7.8-1.6M2.1 2.9L2.2 7.2M-2.1 2.9L-2.2 7.2M-3.4-1.1L-7.8-1.6" stroke="#0A0F2E" stroke-width=".8"/>
-    </g></g>
-    <g transform="translate(612 398)"><circle id="in-impacto" r="6" fill="none" stroke="#8CF3FA" stroke-width="3" opacity="0"/></g>
-    <!-- luces del estadio -->
-    <rect class="in-oscuro" width="1000" height="1000" fill="#01020C" opacity=".86"/>
-    <g id="in-haces">
-      <path class="in-haz" d="M100 64H180L420 1000H-160Z" fill="url(#in-haz-g)"/>
-      <path class="in-haz" d="M340 64H420L560 1000H120Z" fill="url(#in-haz-g)"/>
-      <path class="in-haz" d="M580 64H660L880 1000H440Z" fill="url(#in-haz-g)"/>
-      <path class="in-haz" d="M820 64H900L1160 1000H580Z" fill="url(#in-haz-g)"/>
-    </g>
-    <g id="in-bancos" fill="#fff">
-      <g class="in-banco" transform="translate(140 46)"><rect x="-62" y="-20" width="124" height="38" rx="5" fill="#0B0F2E"/><g class="in-lampara"><circle cx="-44" cy="-8" r="5"/><circle cx="-22" cy="-8" r="5"/><circle cx="0" cy="-8" r="5"/><circle cx="22" cy="-8" r="5"/><circle cx="44" cy="-8" r="5"/><circle cx="-44" cy="7" r="5"/><circle cx="-22" cy="7" r="5"/><circle cx="0" cy="7" r="5"/><circle cx="22" cy="7" r="5"/><circle cx="44" cy="7" r="5"/></g></g>
-      <g class="in-banco" transform="translate(380 46)"><rect x="-62" y="-20" width="124" height="38" rx="5" fill="#0B0F2E"/><g class="in-lampara"><circle cx="-44" cy="-8" r="5"/><circle cx="-22" cy="-8" r="5"/><circle cx="0" cy="-8" r="5"/><circle cx="22" cy="-8" r="5"/><circle cx="44" cy="-8" r="5"/><circle cx="-44" cy="7" r="5"/><circle cx="-22" cy="7" r="5"/><circle cx="0" cy="7" r="5"/><circle cx="22" cy="7" r="5"/><circle cx="44" cy="7" r="5"/></g></g>
-      <g class="in-banco" transform="translate(620 46)"><rect x="-62" y="-20" width="124" height="38" rx="5" fill="#0B0F2E"/><g class="in-lampara"><circle cx="-44" cy="-8" r="5"/><circle cx="-22" cy="-8" r="5"/><circle cx="0" cy="-8" r="5"/><circle cx="22" cy="-8" r="5"/><circle cx="44" cy="-8" r="5"/><circle cx="-44" cy="7" r="5"/><circle cx="-22" cy="7" r="5"/><circle cx="0" cy="7" r="5"/><circle cx="22" cy="7" r="5"/><circle cx="44" cy="7" r="5"/></g></g>
-      <g class="in-banco" transform="translate(860 46)"><rect x="-62" y="-20" width="124" height="38" rx="5" fill="#0B0F2E"/><g class="in-lampara"><circle cx="-44" cy="-8" r="5"/><circle cx="-22" cy="-8" r="5"/><circle cx="0" cy="-8" r="5"/><circle cx="22" cy="-8" r="5"/><circle cx="44" cy="-8" r="5"/><circle cx="-44" cy="7" r="5"/><circle cx="-22" cy="7" r="5"/><circle cx="0" cy="7" r="5"/><circle cx="22" cy="7" r="5"/><circle cx="44" cy="7" r="5"/></g></g>
-    </g>
-    <g id="in-flashes"></g>
-    <rect width="1000" height="1000" fill="url(#in-vin)" pointer-events="none"/>
-  </svg>
-  <canvas class="in-confeti" id="in-confeti" aria-hidden="true"></canvas>
-  <div class="in-blanco" id="in-blanco"></div>
-  <p class="in-gol" id="in-gol" aria-hidden="true">¡GOL!</p>
-  <div class="in-cierre" id="in-cierre" aria-hidden="true">
-    <div class="in-logos"><img src="assets/img/logos/seven-pro-league.png" alt=""><b>×</b><img src="assets/img/logos/var-seven-pro-shop.webp" alt=""></div>
-    <p>Seven Pro League <em>×</em> VAR</p>
+<!-- apertura: entrada de marca con el logo de Seven Pro League (assets/js/intro.js) -->
+<div class="intro" id="intro" aria-label="Seven Pro League × VAR">
+  <div class="in-puerta in-puerta-a"></div>
+  <div class="in-puerta in-puerta-b"></div>
+  <svg class="in-costura" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="-2" y1="61" x2="102" y2="39"/></svg>
+  <div class="in-escena" aria-hidden="true">
+    <div class="in-aurora"><i></i><i></i><i></i></div>
+    <div class="in-rejilla"></div>
+    <span class="in-siete">7</span>
+    <canvas class="in-polvo" id="in-polvo"></canvas>
+    <div class="in-linea"></div>
+    <div class="in-centro">
+      <div class="in-logo">
+        <span class="in-onda"></span>
+        <span class="in-aro"></span>
+        <span class="in-croma in-croma-c"></span>
+        <span class="in-croma in-croma-r"></span>
+        <img src="assets/img/logos/seven-pro-league-hd.webp" alt="" width="560" height="554" decoding="async">
+        <span class="in-brillo"></span>
+      </div>
+      <p class="in-nombre"><span class="in-letras">Seven Pro League</span></p>
+      <p class="in-sub"><img src="assets/img/logos/var-seven-pro-shop.webp" alt="">Seven Pro Shop <b>×</b> VAR</p>
+    </div>
+    <div class="in-carga"><span class="in-num" id="in-num">000</span><span class="in-barra"><i id="in-barra"></i></span><span class="in-lugar">Barranquilla · F7</span></div>
   </div>
-  <div class="intro-ui">
-    <div class="in-logos"><img src="assets/img/logos/seven-pro-league.png" alt="Seven Pro League"><b>×</b><img src="assets/img/logos/var-seven-pro-shop.webp" alt="Seven Pro Shop × VAR"></div>
-    <p class="in-eyebrow">Seven Pro League × VAR</p>
-    <h1 class="in-titulo">Bienvenido<br>al estadio</h1>
-    <button class="in-entrar" id="in-entrar" type="button" onclick="if(!window.SPintro){document.getElementById('intro').remove();document.documentElement.classList.remove('intro-on')}"><span aria-hidden="true">⚽</span>Entrar al estadio</button>
-    <p class="in-vol">🔊 Sube el volumen</p>
-    <p class="in-credito">Sonido de tribuna: <a href="https://commons.wikimedia.org/wiki/File:Arrowhead_Stadium_crowd_noise.wav" target="_blank" rel="noopener">Kj1595</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-SA 4.0</a></p>
-  </div>
-  <a class="in-saltar" id="in-saltar" href="#" onclick="if(!window.SPintro){event.preventDefault();document.getElementById('intro').remove();document.documentElement.classList.remove('intro-on')}">Saltar</a>
+  <button class="in-saltar" id="in-saltar" type="button" onclick="if(!window.SPintro){document.getElementById('intro').remove();document.documentElement.classList.remove('intro-on')}">Saltar</button>
 </div>
 <main>
   <!-- portada: dos puertas -->

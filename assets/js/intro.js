@@ -1,6 +1,6 @@
-// Apertura del inicio: se encienden las luces, penalti, ¡GOL! con la tribuna y se abre la página.
-// El sonido necesita que la persona toque la pantalla (los navegadores lo bloquean), por eso arranca con "Entrar al estadio".
-// Grito de tribuna: "Arrowhead Stadium crowd noise" de Kj1595, CC BY-SA 4.0, vía Wikimedia Commons (recortado y comprimido).
+// Apertura del inicio: entrada de marca con el logo de Seven Pro League (sin sonido, arranca sola).
+// Línea de luz → fondo vivo → escudo con aberración de color, onda y brillo → nombre letra a letra
+// → la barra llega a 100 cuando la página terminó de cargar → el fondo se parte en diagonal y aparece la página.
 'use strict';
 (() => {
   const intro = document.getElementById('intro');
@@ -12,229 +12,132 @@
   const $$ = s => [...intro.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const espera = ms => new Promise(r => setTimeout(r, ms));
-  const anim = (el, frames, op) => (typeof el === 'string' ? $$(el) : [el]).filter(Boolean).map(e => e.animate(frames, { fill: 'forwards', easing: 'ease-in-out', ...op }));
-  const rot = d => ({ transform: `rotate(${d}deg)` });
-  const pos = (x, y, s = 1) => ({ transform: `translate(${x}px, ${y}px) scale(${s})` });
-  let terminado = false, jugando = false;
+  const E = 'cubic-bezier(.16, 1, .3, 1)';
+  const anim = (el, frames, op) => (typeof el === 'string' ? $$(el) : [el]).filter(Boolean).map(e => e.animate(frames, { fill: 'forwards', easing: E, ...op }));
+  let terminado = false;
+  const t0 = performance.now();
 
-  // ───────── sonido ─────────
-  const datosAudio = fetch('assets/audio/tribuna-gol.m4a').then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null);
-  let ctx = null, master = null, tribuna = null;
-  function prepararAudio() {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    try {
-      ctx = new AC();
-      ctx.resume?.();
-      master = ctx.createGain(); master.gain.value = .9; master.connect(ctx.destination);
-      tribuna = new Promise(res => datosAudio.then(ab => {
-        if (!ab) return res(null);
-        ctx.decodeAudioData(ab, buf => {
-          // la grabación pasa por un filtro: cerrado suena a murmullo lejano, abierto es el grito de gol
-          const src = ctx.createBufferSource(), filtro = ctx.createBiquadFilter(), gan = ctx.createGain();
-          src.buffer = buf; filtro.type = 'lowpass'; filtro.frequency.value = 420; gan.gain.value = 0;
-          src.connect(filtro); filtro.connect(gan); gan.connect(master);
-          res({ src, filtro, gan });
-        }, () => res(null));
-      }));
-    } catch { ctx = null; }
-  }
-  const ahora = () => ctx.currentTime;
-  async function murmullo() {
-    const t = await tribuna; if (!t || terminado) return;
-    t.src.start(); t.gan.gain.setValueAtTime(0, ahora()); t.gan.gain.linearRampToValueAtTime(.55, ahora() + 1.2);
-  }
-  async function gritoGol() {
-    const t = await tribuna; if (!t) return;
-    const n = ahora();
-    t.filtro.frequency.cancelScheduledValues(n); t.filtro.frequency.setValueAtTime(t.filtro.frequency.value, n); t.filtro.frequency.exponentialRampToValueAtTime(16000, n + .18);
-    t.gan.gain.cancelScheduledValues(n); t.gan.gain.setValueAtTime(t.gan.gain.value, n); t.gan.gain.linearRampToValueAtTime(1.05, n + .15);
-  }
-  function silbato() {
-    if (!ctx) return;
-    const n = ahora(), o = ctx.createOscillator(), lfo = ctx.createOscillator(), prof = ctx.createGain(), g = ctx.createGain();
-    o.type = 'sine'; o.frequency.value = 3050; lfo.frequency.value = 32; prof.gain.value = 140;
-    lfo.connect(prof); prof.connect(o.frequency); o.connect(g); g.connect(master);
-    g.gain.setValueAtTime(0, n); g.gain.linearRampToValueAtTime(.14, n + .02); g.gain.setValueAtTime(.14, n + .5); g.gain.linearRampToValueAtTime(0, n + .58);
-    o.start(n); lfo.start(n); o.stop(n + .6); lfo.stop(n + .6);
-  }
-  function ruido(dur, freq, vol, tipo = 'bandpass') {
-    if (!ctx) return;
-    const n = ahora(), len = Math.floor(ctx.sampleRate * dur), b = ctx.createBuffer(1, len, ctx.sampleRate), d = b.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 2;
-    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-    s.buffer = b; f.type = tipo; f.frequency.value = freq; g.gain.value = vol;
-    s.connect(f); f.connect(g); g.connect(master); s.start(n);
-  }
-  function patada() {
-    if (!ctx) return;
-    const n = ahora(), o = ctx.createOscillator(), g = ctx.createGain();
-    o.frequency.setValueAtTime(150, n); o.frequency.exponentialRampToValueAtTime(45, n + .13);
-    g.gain.setValueAtTime(.9, n); g.gain.exponentialRampToValueAtTime(.001, n + .16);
-    o.connect(g); g.connect(master); o.start(n); o.stop(n + .18);
-    ruido(.04, 1800, .35);
-  }
-  const clunk = () => ruido(.08, 260, .5, 'lowpass');
-  function apagarAudio(seg) {
-    if (!ctx) return;
-    const n = ahora();
-    master.gain.cancelScheduledValues(n); master.gain.setValueAtTime(master.gain.value, n); master.gain.linearRampToValueAtTime(0, n + seg);
-    setTimeout(() => ctx.close?.(), seg * 1000 + 200);
+  // nombre letra a letra ("League" en degradado)
+  const nombre = $('.in-letras');
+  if (nombre) {
+    const txt = nombre.textContent.trim();
+    nombre.textContent = '';
+    txt.split(' ').forEach((pal, w) => {
+      [...pal].forEach(ch => { const l = document.createElement('span'); l.className = 'l' + (w === 2 ? ' g' : ''); l.innerHTML = `<span>${ch}</span>`; nombre.appendChild(l); });
+      if (w < 2) { const sp = document.createElement('span'); sp.className = 'l'; sp.innerHTML = '<span>&nbsp;</span>'; nombre.appendChild(sp); }
+    });
   }
 
-  // ───────── piezas de la escena ─────────
-  // valla LED: el texto corre en bucle sin saltos (se mide un tramo de los 4 repetidos)
-  const led = $('#in-led'), ledTxt = led?.querySelector('text');
-  if (led && ledTxt && !reduce) {
-    const tramo = () => { const w = ledTxt.getComputedTextLength() / 4; if (w) led.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-w}px)` }], { duration: w * 22, iterations: Infinity }); };
-    document.fonts?.ready ? document.fonts.ready.then(tramo) : tramo();
+  // ───────── partículas de luz ─────────
+  const lienzo = $('#in-polvo');
+  const polvo = [];
+  let cx = null, W = 0, H = 0;
+  function medir() {
+    if (!lienzo) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = lienzo.clientWidth; H = lienzo.clientHeight;
+    lienzo.width = W * dpr; lienzo.height = H * dpr;
+    cx = lienzo.getContext('2d'); cx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  // portero esperando: se mueve de lado a lado
-  const balanceo = reduce ? [] : anim('#p-c', [{ transform: 'translate(-22px, 0)' }, { transform: 'translate(0, -6px)' }, { transform: 'translate(22px, 0)' }], { duration: 900, iterations: Infinity, direction: 'alternate', fill: 'none' });
-
-  // flashes de cámaras en la tribuna
-  const SVGNS = 'http://www.w3.org/2000/svg', capaFlash = $('#in-flashes');
-  function flashes(n, desde, hasta) {
+  const centro = () => { const r = $('.in-logo')?.getBoundingClientRect(); return r ? [r.left + r.width / 2, r.top + r.height / 2] : [W / 2, H / 2]; };
+  function sembrar(n, rafaga) {
+    const [x0, y0] = centro();
     for (let i = 0; i < n; i++) {
-      const c = document.createElementNS(SVGNS, 'circle');
-      c.setAttribute('cx', (Math.random() * 1000).toFixed(0)); c.setAttribute('cy', (96 + Math.random() * 280).toFixed(0));
-      c.setAttribute('r', (1.6 + Math.random() * 2.6).toFixed(1)); c.setAttribute('class', 'in-flash');
-      capaFlash.appendChild(c);
-      c.animate([{ opacity: 0 }, { opacity: 1, offset: .25 }, { opacity: 0 }], { duration: 220, delay: desde + Math.random() * (hasta - desde), fill: 'both' });
+      const a = Math.random() * Math.PI * 2, v = rafaga ? 2.5 + Math.random() * 6 : .15 + Math.random() * .45;
+      const d = rafaga ? 30 + Math.random() * 40 : 40 + Math.random() * Math.max(W, H) * .45;
+      polvo.push({ x: x0 + Math.cos(a) * d, y: y0 + Math.sin(a) * d, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (rafaga ? 0 : .25), r: .6 + Math.random() * (rafaga ? 2.2 : 1.6), a: 0, max: .35 + Math.random() * .6, f: rafaga ? .955 : 1, c: Math.random() < .7 ? '140,243,250' : '255,255,255' });
     }
   }
-
-  // confeti con los colores de la marca
-  const lienzo = $('#in-confeti');
-  function confeti() {
-    if (!lienzo || reduce) return;
-    const dpr = Math.min(2, window.devicePixelRatio || 1), W = lienzo.clientWidth, H = lienzo.clientHeight, cx = lienzo.getContext('2d');
-    lienzo.width = W * dpr; lienzo.height = H * dpr; cx.scale(dpr, dpr);
-    const colores = ['#3FE0F0', '#2433E0', '#FFD54A', '#FF2E4D', '#FFFFFF', '#3B5BFF', '#8CF3FA'];
-    const p = [];
-    const lanzar = (x, y, ang, n) => { for (let i = 0; i < n; i++) { const a = ang + (Math.random() - .5) * 1.1, v = (7 + Math.random() * 10) * Math.min(1.2, H / 700); p.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6.28, vr: (Math.random() - .5) * .35, w: 6 + Math.random() * 7, h: 4 + Math.random() * 5, c: colores[i % colores.length] }); } };
-    lanzar(0, H, -1.05, 90); lanzar(W, H, -2.09, 90); lanzar(W / 2, H * .35, -1.57, 50);
-    const t0 = performance.now();
-    (function cuadro(t) {
-      cx.clearRect(0, 0, W, H);
-      for (const q of p) { q.vy += .32; q.vx *= .992; q.x += q.vx; q.y += q.vy; q.r += q.vr; cx.save(); cx.translate(q.x, q.y); cx.rotate(q.r); cx.fillStyle = q.c; cx.fillRect(-q.w / 2, -q.h / 2, q.w, q.h * Math.abs(Math.cos(q.r * 1.7))); cx.restore(); }
-      if (t - t0 < 4200 && !terminado) requestAnimationFrame(cuadro); else cx.clearRect(0, 0, W, H);
-    })(t0);
+  function dibujar() {
+    if (!cx || terminado) return;
+    cx.clearRect(0, 0, W, H);
+    cx.globalCompositeOperation = 'lighter';
+    for (const p of polvo) {
+      p.vx *= p.f; p.vy *= p.f; p.x += p.vx; p.y += p.vy; p.a = Math.min(p.max, p.a + .03);
+      cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 6.283);
+      cx.fillStyle = `rgba(${p.c},${p.a})`; cx.shadowBlur = 8; cx.shadowColor = `rgba(${p.c},.9)`; cx.fill();
+    }
+    requestAnimationFrame(dibujar);
   }
 
-  // ───────── el cobrador ─────────
-  const ZANCADA = 440;
-  function correr(veces) {
-    const op = { duration: ZANCADA, iterations: veces, easing: 'linear', fill: 'forwards' };
-    return [
-      ...anim('#k-muslo-r', [rot(-40), rot(38), rot(-40)], op), ...anim('#k-pierna-r', [rot(10), rot(20), rot(95), rot(60), rot(10)], op),
-      ...anim('#k-muslo-l', [rot(38), rot(-40), rot(38)], op), ...anim('#k-pierna-l', [rot(95), rot(60), rot(10), rot(20), rot(95)], op),
-      ...anim('#k-brazo-r', [rot(40), rot(-45), rot(40)], op), ...anim('#k-brazo-l', [rot(-45), rot(40), rot(-45)], op),
-      ...anim('#k-cuerpo', [{ transform: 'translateY(0)' }, { transform: 'translateY(-7px)' }, { transform: 'translateY(0)' }], { ...op, duration: ZANCADA / 2, iterations: veces * 2 }),
-    ];
+  // ───────── barra de carga: avanza sola hasta 92 y llega a 100 cuando la página terminó de cargar ─────────
+  const barra = $('#in-barra'), num = $('#in-num');
+  let avance = 0, objetivo = 0;
+  function contar() {
+    avance += (objetivo - avance) * .12;
+    if (objetivo - avance < .3) avance = objetivo;
+    if (barra) barra.style.transform = `scaleX(${avance / 100})`;
+    if (num) num.textContent = String(Math.round(avance)).padStart(3, '0');
+    if (!terminado) requestAnimationFrame(contar);
   }
-  const pose = (dur, p, easing = 'ease-out') => Object.entries(p).forEach(([id, deg]) => anim(id === 'tronco' ? '.k-tronco' : '#k-' + id, [rot(deg)], { duration: dur, easing }));
+  const cargada = document.readyState === 'complete' ? Promise.resolve() : new Promise(r => addEventListener('load', r, { once: true }));
+  const listo = Promise.race([cargada, espera(5200)]);
 
-  // ───────── la jugada ─────────
-  async function jugar() {
-    if (jugando) return; jugando = true;
-    intro.classList.add('juega');
-    if (reduce) { await espera(300); return salir(1.2); }
+  async function correr() {
+    const img = $('.in-logo img');
+    await Promise.race([img?.decode?.().catch(() => {}), espera(1200)]);
+    if (terminado) return;
+    if (reduce) {
+      intro.classList.add('in-vivo', 'in-logo-on');
+      img.style.opacity = 1; $('.in-sub').style.opacity = 1;
+      $$('.in-nombre .l > span').forEach(s => { s.style.transform = 'none'; });
+      await espera(1100);
+      return salir();
+    }
+    medir(); dibujar(); contar();
+    const reloj = setInterval(() => { objetivo = Math.max(objetivo, Math.min(92, (performance.now() - t0) / 26)); if (terminado) clearInterval(reloj); }, 60);
 
-    // 1. se encienden las luces, banco por banco
-    const bancos = $$('.in-banco'), haces = $$('.in-haz');
-    for (let i = 0; i < bancos.length; i++) { await espera(170); bancos[i].classList.add('on'); haces[i]?.classList.add('on'); clunk(); }
-    intro.classList.add('luces');
-    murmullo();
-    flashes(10, 200, 1900);
-    await espera(550);
-
-    // 2. silbato y carrera
-    silbato();
+    // 1. línea de luz
+    anim('.in-linea', [{ transform: 'scaleX(0)', opacity: 1 }, { transform: 'scaleX(1)', opacity: 1 }], { duration: 560 });
     await espera(380);
-    const carrera = correr(3);
-    anim('#k', [pos(330, 860, 1), pos(455, 668, .8)], { duration: ZANCADA * 3, easing: 'linear' });
-    anim('#k-sombra', [pos(334, 862, 1), pos(459, 670, .8)], { duration: ZANCADA * 3, easing: 'linear' });
-    await espera(ZANCADA * 3 - 60);
-    carrera.forEach(a => { a.commitStyles?.(); a.cancel(); });
+    // 2. se enciende el fondo
+    intro.classList.add('in-vivo');
+    sembrar(46, false);
+    await espera(140);
+    anim('.in-linea', [{ transform: 'scaleX(1)', opacity: 1 }, { transform: 'scaleX(1.35) scaleY(.4)', opacity: 0 }], { duration: 600 });
+    // 3. el escudo entra desenfocado con los colores separados y se junta
+    anim(img, [{ opacity: 0, transform: 'scale(1.2)', filter: 'blur(14px) drop-shadow(0 18px 36px rgba(0,0,0,.55))' }, { opacity: 1, offset: .4 }, { opacity: 1, transform: 'scale(1)', filter: 'blur(0) drop-shadow(0 18px 36px rgba(0,0,0,.55))' }], { duration: 1050 });
+    // borde de colores separados que tiembla un instante (efecto de transmisión) y se junta
+    const glitch = (dx, dy) => [{ opacity: 0, transform: `translate(${dx}px, ${dy}px)` }, { opacity: .8, transform: `translate(${dx}px, ${dy}px)`, offset: .12 }, { opacity: .65, transform: `translate(${-dx * .45}px, ${-dy}px)`, offset: .28 }, { opacity: .55, transform: `translate(${dx * .6}px, 0)`, offset: .44 }, { opacity: .35, transform: `translate(${-dx * .25}px, ${dy * .5}px)`, offset: .62 }, { opacity: .15, transform: `translate(${dx * .1}px, 0)`, offset: .8 }, { opacity: 0, transform: 'none' }];
+    anim('.in-croma-c', glitch(-12, 3), { duration: 760, delay: 260, easing: 'linear' });
+    anim('.in-croma-r', glitch(12, -3), { duration: 760, delay: 260, easing: 'linear' });
+    await espera(260);
+    intro.classList.add('in-logo-on');
+    anim('.in-onda', [{ transform: 'translate(-50%, -50%) scale(.45)', opacity: .95 }, { transform: 'translate(-50%, -50%) scale(2.4)', opacity: 0 }], { duration: 1200, easing: 'cubic-bezier(.2,.7,.3,1)' });
+    sembrar(38, true);
+    // 4. nombre letra a letra
+    await espera(300);
+    $$('.in-nombre .l > span').forEach((s, i) => anim(s, [{ transform: 'translateY(112%) skewY(8deg)' }, { transform: 'translateY(0) skewY(0)' }], { duration: 700, delay: i * 30 }));
+    // 5. brillo sobre el escudo
+    await espera(260);
+    anim('.in-brillo', [{ opacity: 1, backgroundPosition: '150% 0' }, { opacity: 1, backgroundPosition: '-50% 0', offset: .85 }, { opacity: 0, backgroundPosition: '-50% 0' }], { duration: 1000, easing: 'cubic-bezier(.45,0,.2,1)' });
+    // 6. línea de VAR
+    await espera(320);
+    anim('.in-sub', [{ opacity: 0, letterSpacing: '.7em', transform: 'translateY(8px)' }, { opacity: 1, letterSpacing: '.32em', transform: 'none' }], { duration: 900 });
 
-    // 3. apoyo, carga y remate
-    pose(140, { 'muslo-l': -8, 'pierna-l': 6, 'muslo-r': 55, 'pierna-r': 100, 'brazo-l': -115, 'ante-l': -25, 'brazo-r': 70, 'ante-r': -40, tronco: -4 });
-    anim('#k-cuerpo', [{ transform: 'translateY(0)' }], { duration: 140 });
-    await espera(150);
-    pose(130, { 'muslo-r': -70, 'pierna-r': -5 }, 'cubic-bezier(.5,0,.9,.6)');
-    anim('#k', [pos(455, 668, .8), pos(470, 664, .8)], { duration: 260 });
-    await espera(82);
-
-    // 4. el balón sale al ángulo; el portero se lanza al otro lado
-    patada();
-    anim('#b', [pos(500, 660), { ...pos(566, 505, .68), offset: .5 }, pos(612, 398, .48)], { duration: 430, easing: 'cubic-bezier(.15,.55,.45,1)' });
-    anim('#b-gira', [rot(0), rot(820)], { duration: 430, easing: 'linear' });
-    anim('#b-sombra', [{ transform: 'translate(503px, 671px) scale(1)', opacity: .45 }, { transform: 'translate(608px, 466px) scale(.5)', opacity: .15 }], { duration: 430 });
-    await espera(70);
-    pose(160, { 'muslo-r': -95, 'pierna-r': -12 });
-    balanceo.forEach(a => { a.commitStyles?.(); a.cancel(); });
-    anim('#p', [{ transform: 'translate(0, 0) rotate(0deg)' }, { transform: 'translate(-120px, -70px) rotate(-55deg)', offset: .55 }, { transform: 'translate(-210px, -20px) rotate(-82deg)' }], { duration: 480, easing: 'cubic-bezier(.3,.6,.4,1)' });
-    anim('#p-brazo-l', [rot(55), rot(170)], { duration: 260 });
-    anim('#p-brazo-r', [rot(-55), rot(-170)], { duration: 260 });
-    await espera(360);
-
-    // 5. ¡GOL!
-    gritoGol();
-    anim('#in-red-anim', [{ transform: 'scale(1)' }, { transform: 'translate(10px, -8px) scale(1.07)' }, { transform: 'translate(-3px, 2px) scale(.98)' }, { transform: 'scale(1)' }], { duration: 650, easing: 'ease-out' });
-    anim('#in-impacto', [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(11)', opacity: 0 }], { duration: 650, easing: 'ease-out' });
-    anim('#b', [pos(612, 398, .48), pos(606, 455, .46)], { duration: 520, easing: 'cubic-bezier(.5,0,1,1)' });
-    anim('#in-blanco', [{ opacity: 0 }, { opacity: .8, offset: .15 }, { opacity: 0 }], { duration: 420, easing: 'ease-out' });
-    intro.classList.add('tiembla'); setTimeout(() => intro.classList.remove('tiembla'), 500);
-    flashes(70, 0, 3000);
-    anim('#in-hinchas-a', [{ transform: 'translateY(0)' }, { transform: 'translateY(-4px)' }], { duration: 190, iterations: 18, direction: 'alternate' });
-    anim('#in-hinchas-b', [{ transform: 'translateY(0)' }, { transform: 'translateY(-5px)' }], { duration: 170, iterations: 20, direction: 'alternate', delay: 90 });
-    confeti();
-    gol();
-
-    // 6. celebración: corre, salta dos veces con los brazos arriba
-    pose(200, { 'muslo-r': -10, 'pierna-r': 10, 'muslo-l': 12, 'pierna-l': 10, tronco: 6 });
-    await espera(220);
-    const fiesta = correr(2);
-    anim('#k', [pos(470, 664, .8), pos(560, 640, .8)], { duration: ZANCADA * 2, easing: 'linear' });
-    anim('#k-sombra', [pos(474, 666, .8), pos(564, 642, .8)], { duration: ZANCADA * 2, easing: 'linear' });
-    await espera(ZANCADA * 2 - 40);
-    fiesta.forEach(a => { a.commitStyles?.(); a.cancel(); });
-    for (let i = 0; i < 2; i++) {
-      pose(160, { 'brazo-r': -165, 'ante-r': -10, 'brazo-l': -150, 'ante-l': -15, 'muslo-r': -50, 'pierna-r': 110, 'muslo-l': -20, 'pierna-l': 80, tronco: -6 });
-      anim('#k', [pos(560, 640, .8), { ...pos(560, 586, .8), easing: 'ease-in' }, pos(560, 640, .8)], { duration: 560, easing: 'ease-out' });
-      await espera(300);
-      pose(220, { 'muslo-r': -5, 'pierna-r': 8, 'muslo-l': 5, 'pierna-l': 8 });
-      await espera(280);
-    }
-
-    // 7. los logos y se abre la página
-    anim('#in-gol', [{ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }, { transform: 'translate(-50%, -50%) scale(.6)', opacity: 0 }], { duration: 380, easing: 'ease-in' });
-    anim('#in-cierre', [{ transform: 'translate(-50%, -50%) scale(.7)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1.04)', opacity: 1, offset: .7 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }], { duration: 650, delay: 200, easing: 'cubic-bezier(.22,1,.36,1)' });
-    await espera(1500);
-    salir(2.6);
+    // 7. espera a que la página esté lista (mínimo 2,6 s en total) y abre
+    await Promise.all([listo, espera(Math.max(0, 2600 - (performance.now() - t0)))]);
+    objetivo = 100;
+    anim('.in-logo', [{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }], { duration: 500 });
+    await espera(420);
+    salir();
   }
 
-  // texto ¡GOOOL! que se estira
-  async function gol() {
-    const el = $('#in-gol');
-    anim(el, [{ transform: 'translate(-50%, -50%) scale(2.6) rotate(-10deg)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(.92) rotate(-4deg)', opacity: 1, offset: .6 }, { transform: 'translate(-50%, -50%) scale(1) rotate(-4deg)', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.2,.9,.3,1.2)' });
-    for (let n = 2; n <= 6; n++) { await espera(130); if (terminado) return; el.textContent = `¡G${'O'.repeat(n)}L!`; }
-  }
-
-  function salir(seg = 1) {
-    if (terminado) return; terminado = true;
+  function salir() {
+    if (intro.classList.contains('in-sale')) return;
+    terminado = true;
     try { sessionStorage.setItem('sp:intro', '1'); } catch { /* sin almacenamiento */ }
-    apagarAudio(seg);
-    intro.classList.add('sale');
+    intro.classList.add('in-sale');
+    anim('.in-costura', [{ opacity: 0 }, { opacity: 1, offset: .35 }, { opacity: 0 }], { duration: 900, easing: 'ease-out' });
+    setTimeout(() => intro.classList.add('in-abre'), reduce ? 0 : 200);
     setTimeout(() => {
       intro.remove(); html.classList.remove('intro-on');
       document.dispatchEvent(new Event('sp:intro-fin'));
-    }, 950);
+    }, reduce ? 700 : 1300);
   }
 
-  $('#in-entrar')?.addEventListener('click', () => { prepararAudio(); jugar(); });
-  $('#in-saltar')?.addEventListener('click', e => { e.preventDefault(); salir(.6); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !terminado) salir(.6); });
-  setTimeout(() => $('#in-entrar')?.focus({ preventScroll: true }), 400);
+  $('#in-saltar')?.addEventListener('click', salir);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') salir(); });
+  addEventListener('resize', () => { if (!terminado) medir(); });
+  correr();
 })();
