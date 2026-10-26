@@ -7,8 +7,11 @@
   const html = document.documentElement;
   if (!intro) return;
   if (html.classList.contains('intro-visto')) { intro.remove(); return; }
-  window.SPintro = true;
   const $ = s => intro.querySelector(s);
+  // si el diseño de la entrada no llegó (caché vieja del celular, red lenta), no se muestra nada roto: se salta
+  const p = $('.in-puerta');
+  if (!p || getComputedStyle(p).position !== 'absolute') { intro.remove(); html.classList.remove('intro-on'); return; }
+  window.SPintro = true;
   const $$ = s => [...intro.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const espera = ms => new Promise(r => setTimeout(r, ms));
