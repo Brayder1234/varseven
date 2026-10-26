@@ -200,11 +200,19 @@
   function medios() {
     medList = (T.medios || []).filter(m => m.url);
     $('#medios').hidden = !medList.length;
-    $('#medios-grid').innerHTML = medList.map((m, i) => {
+    // una sola línea que se mueve sola (como la barra de avisos): la lista se repite para que el giro no tenga saltos
+    const tarjeta = (m, i, copia) => {
       const id = m.tipo === 'video' ? SP.youtubeId(m.url) : '';
       const img = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : m.tipo === 'video' ? '' : m.url;
-      return `<button data-medio="${i}" class="r ${m.tipo === 'video' ? 'es-video' : ''}" style="--d:${(i % 4) * .05}s">${img ? `<img src="${esc(img)}" alt="${esc(m.titulo || '')}" loading="lazy">` : '<div class="sin-mini">▶</div>'}${m.tipo === 'video' ? '<i class="play">▶</i>' : ''}<span>${esc(m.titulo || '')}</span></button>`;
-    }).join('');
+      const media = m.subido ? `<video src="${esc(m.url)}#t=0.5" preload="metadata" muted playsinline tabindex="-1"></video>`
+        : img ? `<img src="${esc(img)}" alt="${esc(copia ? '' : m.titulo || '')}" loading="lazy">` : '<div class="sin-mini">▶</div>';
+      return `<button data-medio="${i}" class="${m.tipo === 'video' ? 'es-video' : ''}" ${copia ? 'tabindex="-1" aria-hidden="true"' : ''}>${media}${m.tipo === 'video' ? '<i class="play">▶</i>' : ''}${m.titulo ? `<span>${esc(m.titulo)}</span>` : ''}</button>`;
+    };
+    const vueltas = Math.max(1, Math.ceil(7 / (medList.length || 1)));
+    const uno = Array.from({ length: vueltas }, (_, k) => medList.map((m, i) => tarjeta(m, i, k > 0))).flat().join('');
+    const copia = medList.map((m, i) => tarjeta(m, i, true)).join('').repeat(vueltas);
+    const ancho = medList.length * vueltas * (SP.movil.matches ? 188 : 250); // alto de la tarjeta × proporción + separación
+    $('#medios-grid').innerHTML = `<div class="cinta-pista" style="--dur:${Math.max(20, Math.round(ancho / 55))}s">${uno}${copia}</div>`;
   }
 
   const lb = $('#lb');
@@ -212,7 +220,7 @@
   const verFoto = i => {
     lbI = (i + lista.length) % lista.length;
     const m = lista[lbI], id = m.tipo === 'video' ? SP.youtubeId(m.url) : '';
-    $('.lb-img', lb).innerHTML = m.tipo === 'video'
+    $('.lb-img', lb).innerHTML = m.subido ? `<video class="lb-vid" src="${esc(m.url)}" controls autoplay playsinline></video>` : m.tipo === 'video'
       ? (id ? `<div class="lb-video"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="${esc(m.titulo || 'Video')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
         : `<a class="btn btn-light" href="${esc(m.url)}" target="_blank" rel="noopener">Ver video ${ICON.ext}</a>`)
       : `<img src="${esc(m.url)}" alt="">`;
