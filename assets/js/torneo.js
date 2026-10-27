@@ -155,6 +155,7 @@
       const pos = g.indexOf(x) + 1;
       return `<div class="podio-item p${pos} r"><span class="lugar">${pos}</span>${x.equipo ? crest(x.equipo.id, pos === 1 ? 'crest-lg' : '') : ''}<span class="n display">${x.goles}</span><b>${esc(x.jugador.nombre)}</b><small>${esc(x.equipo?.nombre || '')}</small></div>`;
     }).join('');
+    SP.revelar($('#podio'));
     const resto = g.slice(3), visibles = golTodos ? resto : resto.slice(0, 12);
     $('#gol-lista').innerHTML = visibles.map((x, i) => `<div class="gol-row"><span class="pos">${i + 4}</span>${x.equipo ? crest(x.equipo.id, 'crest-sm') : '<span></span>'}<b>${esc(x.jugador.nombre)}<small>${esc(x.equipo?.nombre || '')}</small></b><span class="g">${x.goles}</span></div>`).join('');
     $('#gol-mas').innerHTML = resto.length > 12 ? `<button class="btn btn-blue btn-sm" id="gol-btn">${golTodos ? 'Ver menos' : `Ver los ${g.length} goleadores`}</button>` : '';
