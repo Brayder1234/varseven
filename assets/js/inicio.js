@@ -165,7 +165,7 @@
     pop.className = 'of-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-modal', 'true'); pop.setAttribute('aria-label', 'Oferta de lanzamiento');
     pop.innerHTML = `<div class="of-pop-scrim" data-x></div><div class="of-pop-card">
       <button class="of-pop-x" data-x aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <p class="eyebrow">🔥 ${pronto ? 'Muy pronto' : 'Solo por esta semana'}</p>
+      <p class="eyebrow">🔥 ${pronto ? 'Muy pronto' : (lz.finDia ? 'Solo hasta el ' + esc(lz.finDia) : 'Por tiempo limitado')}</p>
       <div class="of-pop-pct display">−${lz.pct}%</div>
       <h3 class="display">En toda la tienda</h3>
       <p>${fechas}.<br>Lanzamiento de la página de <b>Seven Pro Shop × VAR</b>.</p>
