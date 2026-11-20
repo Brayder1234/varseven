@@ -14,6 +14,10 @@
 <link rel="stylesheet" href="assets/css/app.css?v=20261027c">
 <link rel="stylesheet" href="assets/css/guia.css?v=20261027c">
 <script>document.documentElement.classList.replace('no-js', 'js')</script>
+<link rel="stylesheet" href="assets/css/navidad.css?v=20261120a">
+<!-- temporada de Navidad: solo cambia el estilo; se quita sola el 7 de enero (?navidad=0 la apaga, ?navidad=1 la fuerza) -->
+<script>(function (q) { if (/[?&]navidad=1/.test(q) || (!/[?&]navidad=0/.test(q) && Date.now() < Date.UTC(2027, 0, 7, 5))) document.documentElement.classList.add('navidad'); })(location.search)</script>
+<script src="assets/js/navidad.js?v=20261120a" defer></script>
 </head>
 <body data-page="guia">
 <main>

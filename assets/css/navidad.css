@@ -1,0 +1,123 @@
+/* Seven Pro League × VAR — temporada de Navidad
+   Solo cambia el estilo: todo cuelga de html.navidad, que pone el <head> de cada página según la fecha
+   (se quita solo el 7 de enero; ?navidad=0 lo apaga y ?navidad=1 lo fuerza). Los datos siguen saliendo del panel.
+   Regla de colores: lo que era azul eléctrico ahora es rojo navideño, el cian pasa a dorado, el blanco hielo
+   pasa a nieve y el verde pino va en los detalles (guirnalda de arriba, luces, árboles del pie). */
+
+html.navidad {
+  --blue: #C8102E; --blue-2: #E3263F; --blue-3: #FF9A8F;
+  --cyan: #F2C14E; --cyan-2: #FFE3A1;
+  --ice: #F5F7FC;
+  --g: #F2C14E;
+  --oro: #F2C14E; --oro-2: #FFE3A1;
+  --pino: #13693D; --pino-2: #1E8A50; --pino-3: #0A3B22;
+  --copo: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23ffffff' stroke-width='1.9' stroke-linecap='round'><path id='a' d='M12 12V2.6M12 6.2 9.5 4M12 6.2 14.5 4M12 9.4l-1.9-1.6M12 9.4l1.9-1.6'/><use href='%23a' transform='rotate(60 12 12)'/><use href='%23a' transform='rotate(120 12 12)'/><use href='%23a' transform='rotate(180 12 12)'/><use href='%23a' transform='rotate(240 12 12)'/><use href='%23a' transform='rotate(300 12 12)'/></g></svg>");
+  --copo-oro: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23F2C14E' stroke-width='1.9' stroke-linecap='round'><path id='a' d='M12 12V2.6M12 6.2 9.5 4M12 6.2 14.5 4M12 9.4l-1.9-1.6M12 9.4l1.9-1.6'/><use href='%23a' transform='rotate(60 12 12)'/><use href='%23a' transform='rotate(120 12 12)'/><use href='%23a' transform='rotate(180 12 12)'/><use href='%23a' transform='rotate(240 12 12)'/><use href='%23a' transform='rotate(300 12 12)'/></g></svg>");
+}
+
+/* ───────── los dos escudos con gorro (mismo tamaño de imagen: nada se mueve) ───────── */
+.navidad img[src$="logos/seven-pro-league.png"] { content: url(../img/logos/navidad/seven-pro-league.webp); }
+.navidad img[src$="logos/seven-pro-league-hd.webp"] { content: url(../img/logos/navidad/seven-pro-league-hd.webp); }
+.navidad img[src$="logos/var-seven-pro-shop.webp"] { content: url(../img/logos/navidad/var-seven-pro-shop.webp); }
+
+/* ───────── textos y botones ───────── */
+.navidad .grad { background-image: linear-gradient(100deg, #FFE9B0 5%, var(--oro) 50%, #E8A33A 95%); }
+.navidad .btn-primary { background: linear-gradient(100deg, #FFE7A8, var(--oro) 50%, #E3A23A); }
+.navidad .tabs-pill { background: linear-gradient(100deg, #FFE7A8, var(--oro) 60%, #E8A33A); }
+.navidad .sec-light .tabs-pill { background: linear-gradient(100deg, var(--blue-2), var(--blue)); }
+.navidad .tag .nino { background: var(--pino-2); color: #fff; }
+.navidad .sec-blue .sponsor span { color: rgba(255, 255, 255, .82); }
+.navidad .sup-tabs .tabs-pill { background: #fff; }
+.navidad .page-hero .accent { color: var(--oro-2); }
+
+/* ───────── barra de avisos: guirnalda verde con copos dorados ───────── */
+.navidad .topbar { background: linear-gradient(90deg, var(--pino-3), var(--pino) 30%, var(--pino-2) 50%, var(--pino) 70%, var(--pino-3)); }
+.navidad .topbar span::before { content: ''; display: inline-block; width: 11px; height: 11px; margin-right: 26px; vertical-align: -1px; background: var(--copo-oro) center / contain no-repeat; }
+
+/* ───────── luces colgando bajo la cabecera (no tapan nada: no reciben toques) ───────── */
+.navidad .nav::before, .navidad .nav::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 20px; pointer-events: none; transition: opacity .3s; }
+.navidad .nav::after { background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='20' viewBox='0 0 120 20'><path d='M0 1.5Q30 12 60 1.5Q90 12 120 1.5' fill='none' stroke='%230E3B25' stroke-width='1.4'/><g fill='%230E3B25'><rect x='13.3' y='4.6' width='3.4' height='3' rx='.6'/><rect x='43.3' y='4.6' width='3.4' height='3' rx='.6'/><rect x='73.3' y='4.6' width='3.4' height='3' rx='.6'/><rect x='103.3' y='4.6' width='3.4' height='3' rx='.6'/></g><ellipse cx='15' cy='11.6' rx='3.3' ry='4.7' fill='%23FF3B52'/><ellipse cx='45' cy='11.6' rx='3.3' ry='4.7' fill='%23FFC94D'/><ellipse cx='75' cy='11.6' rx='3.3' ry='4.7' fill='%233DDB84'/><ellipse cx='105' cy='11.6' rx='3.3' ry='4.7' fill='%23E9F6FF'/><g fill='%23fff' opacity='.7'><ellipse cx='14' cy='10' rx='1' ry='1.6'/><ellipse cx='44' cy='10' rx='1' ry='1.6'/><ellipse cx='74' cy='10' rx='1' ry='1.6'/><ellipse cx='104' cy='10' rx='1' ry='1.6'/></g></svg>") 0 0 / 120px 20px repeat-x; }
+/* brillo que salta de un bombillo al otro */
+.navidad .nav::before { background: radial-gradient(circle at 15px 12px, rgba(255, 244, 214, .85) 0, rgba(255, 236, 190, .35) 4px, rgba(255, 236, 190, 0) 10px) 0 0 / 60px 20px repeat-x; mix-blend-mode: screen; animation: nv-luces 1.8s steps(1) infinite; }
+@keyframes nv-luces { 50% { background-position: 30px 0; } }
+.nav-hide .nav::before, .nav-hide .nav::after, .nv-pegado .nav::before, .nv-pegado .nav::after { opacity: 0; }
+/* la ficha de producto empieza un poco más abajo para que las luces no rocen la ruta */
+.navidad .pd { padding-top: 44px; }
+@media (max-width: 760px) { .navidad .pd { padding-top: 32px; } }
+
+/* ───────── inicio ───────── */
+.navidad .door-torneo .door-bg::after { background: linear-gradient(180deg, rgba(200, 16, 46, .26) 0%, rgba(96, 8, 26, .66) 45%, rgba(4, 5, 26, .96) 100%), repeating-linear-gradient(115deg, rgba(255, 255, 255, .05) 0 2px, transparent 2px 46px); }
+/* luces desenfocadas de fondo en la puerta de la tienda */
+.navidad .door-tienda .door-bg::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55;
+  background: radial-gradient(circle at 12% 14%, rgba(242, 193, 78, .5) 0, transparent 2.2%), radial-gradient(circle at 31% 8%, rgba(227, 38, 63, .55) 0, transparent 2.6%), radial-gradient(circle at 52% 16%, rgba(61, 219, 132, .45) 0, transparent 2%), radial-gradient(circle at 74% 6%, rgba(242, 193, 78, .45) 0, transparent 2.4%), radial-gradient(circle at 90% 18%, rgba(227, 38, 63, .45) 0, transparent 2%), radial-gradient(circle at 22% 30%, rgba(255, 255, 255, .25) 0, transparent 1.2%), radial-gradient(circle at 64% 28%, rgba(255, 255, 255, .22) 0, transparent 1.1%); }
+/* el "×" del centro es una esfera de Navidad */
+.navidad .split-vs { color: #fff; background: radial-gradient(circle at 34% 28%, #FF6B7B 0, var(--blue) 46%, #6E0819 100%); box-shadow: 0 0 0 3px var(--oro), 0 20px 40px -10px rgba(0, 0, 0, .7); overflow: visible; }
+.navidad .split-vs::before { content: ''; position: absolute; left: 50%; top: -11px; width: 22px; height: 13px; margin-left: -11px; border-radius: 4px 4px 2px 2px; background: linear-gradient(90deg, #9C6A18, #FFE3A1 45%, #C8922A); box-shadow: 0 2px 4px rgba(0, 0, 0, .4); }
+.navidad .split-vs::after { content: ''; position: absolute; left: 50%; top: -21px; width: 12px; height: 12px; margin-left: -6px; border: 2px solid var(--oro); border-radius: 50%; }
+/* cinta: moño rojo con bordes dorados y copos */
+.navidad .ribbon { background: linear-gradient(90deg, #A50D25, #D41F3A 50%, #A50D25); color: #fff; box-shadow: inset 0 3px 0 var(--oro), inset 0 -3px 0 var(--oro), 0 20px 40px -20px rgba(0, 0, 0, .8); }
+.navidad .ribbon i { display: inline-block; width: 22px; height: 22px; font-size: 0; background: var(--copo) center / contain no-repeat; }
+.navidad .lider { background: linear-gradient(110deg, rgba(242, 193, 78, .16), rgba(200, 16, 46, .12)); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .3); }
+.navidad .oferta { background: radial-gradient(60% 90% at 15% 40%, rgba(200, 16, 46, .45), transparent 70%), radial-gradient(50% 80% at 90% 60%, rgba(242, 193, 78, .2), transparent 70%), linear-gradient(180deg, var(--n950), #0B1240); }
+
+/* ───────── bloques de color: rojo de regalo y verde pino ───────── */
+.navidad .sec-blue, .navidad .page-hero { background: linear-gradient(135deg, #CC1530 0%, #A30D26 50%, #6A0718 100%); }
+.navidad .sec-blue::before, .navidad .page-hero::before { background: repeating-linear-gradient(115deg, rgba(255, 227, 161, .07) 0 2px, transparent 2px 46px); }
+.navidad .banner { background: linear-gradient(120deg, #17733F, #0F5732 55%, #0A3B22); }
+/* secciones claras: nieve con copos muy suaves */
+.navidad .sec-light { background-color: var(--ice); background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><defs><g id='c' fill='none' stroke='%23D5DCEE' stroke-width='1.5' stroke-linecap='round'><path id='a' d='M0 0V-9M0 -5.4 -2.4 -7.4M0 -5.4 2.4 -7.4'/><use href='%23a' transform='rotate(60)'/><use href='%23a' transform='rotate(120)'/><use href='%23a' transform='rotate(180)'/><use href='%23a' transform='rotate(240)'/><use href='%23a' transform='rotate(300)'/></g></defs><use href='%23c' transform='translate(30 34)'/><use href='%23c' transform='translate(124 70) scale(.7)'/><use href='%23c' transform='translate(70 140) scale(.85)'/><use href='%23c' transform='translate(160 160) scale(.55)'/></svg>"); }
+
+/* esferas que cuelgan en las portadas de Torneo, Tienda y Guía (las pone navidad.js) */
+.navidad .page-hero .wrap { z-index: 1; }
+.nv-esferas { position: absolute; inset: 0 0 auto; height: 0; z-index: 0; pointer-events: none; }
+.nv-esfera { position: absolute; top: 0; left: var(--x); width: var(--s); transform-origin: 50% 0; animation: nv-mece var(--t, 5s) ease-in-out var(--d, 0s) infinite alternate; }
+.nv-esfera::before { content: ''; display: block; width: 1.5px; height: calc(var(--l) + 14px); margin: 0 auto; background: linear-gradient(rgba(255, 227, 161, .25), rgba(255, 227, 161, .8)); }
+.nv-esfera svg { display: block; width: 100%; height: auto; margin-top: -1px; filter: drop-shadow(0 10px 12px rgba(40, 0, 8, .45)); }
+@keyframes nv-mece { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+/* los hilos arrancan debajo de las luces de la cabecera */
+@media (min-width: 761px) and (max-width: 1279px) { .nv-esfera { width: calc(var(--s) * .8); } .nv-esfera::before { height: calc(var(--l) * .6 + 12px); } }
+@media (max-width: 760px) { .nv-esfera { width: calc(var(--s) * .62); } .nv-esfera::before { height: calc(var(--l) * .5 + 18px); } .nv-esfera.solo-pc { display: none; } }
+
+/* ───────── torneo, tienda y guía: el cian pasa a dorado ───────── */
+.navidad .subnav a.on, .navidad .fecha-chips button[aria-pressed="true"] { background: linear-gradient(100deg, #FFE7A8, var(--oro) 60%, #E8A33A); }
+.navidad button.partido:hover { box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .5), 0 24px 40px -26px rgba(242, 193, 78, .55); }
+.navidad .partido .estado.fin { background: rgba(242, 193, 78, .15); }
+.navidad .md-mvp { background: rgba(242, 193, 78, .12); }
+.navidad .promo-nota { background: rgba(242, 193, 78, .1); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, .3); }
+.navidad .ins-box { background: linear-gradient(135deg, #4A0B1E, var(--n850)); }
+.navidad .ins-box::before { background: radial-gradient(closest-side, rgba(242, 193, 78, .2), transparent); }
+.navidad .md-panel { background: linear-gradient(180deg, #3E0C22, var(--n900) 40%); }
+.navidad .sup-vis::before { background: radial-gradient(closest-side, rgba(242, 193, 78, .26), transparent 72%); }
+.navidad .barra i::after { background: linear-gradient(90deg, var(--oro), #fff); }
+
+/* ───────── pie: suelo nevado con pinos ───────── */
+.navidad .foot { padding-bottom: 104px; }
+.navidad .foot::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 84px; pointer-events: none;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1440' height='84' viewBox='0 0 1440 84'><defs><linearGradient id='n' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23FFFFFF'/><stop offset='1' stop-color='%23D9E2F5'/></linearGradient><g id='p'><rect x='-2.5' y='-1' width='5' height='7' fill='%235B3A1E'/><path d='M0-34 13-14H6l11 14H-17L-6-14H-13Z' fill='%2313693D'/><path d='M0-34 5.6-25.4 2.4-24.2 0-26 -2.6-24-5.6-25.4Z' fill='%23F4F7FF'/><path d='M6-14l5.4 6.9-3 .9-2.6-2-2.8 2.2-3-1.4-2.8 2-3.2-1.8-2.6 1.6L-6-14Z' fill='%23F4F7FF' opacity='.85'/></g></defs><use href='%23p' transform='translate(96 51.3) scale(1.45)'/><use href='%23p' transform='translate(134 54) scale(1)'/><use href='%23p' transform='translate(560 52.8) scale(1.2)'/><use href='%23p' transform='translate(905 60.4) scale(1.1)'/><use href='%23p' transform='translate(1290 50.9) scale(1.35)'/><use href='%23p' transform='translate(1336 54.3) scale(.95)'/><path d='M0 64C90 52 170 58 250 63S420 72 520 61 700 50 820 60 1000 71 1110 63 1290 52 1440 62V84H0Z' fill='url(%23n)'/><path d='M0 64C90 52 170 58 250 63S420 72 520 61 700 50 820 60 1000 71 1110 63 1290 52 1440 62' fill='none' stroke='%23fff' stroke-width='2' opacity='.9'/></svg>") center bottom / 1440px 84px repeat-x; }
+
+/* ───────── apertura del inicio ───────── */
+.navidad .intro { --in-polvo: 255, 214, 120; }
+.navidad .in-aurora i:nth-child(1) { background: radial-gradient(closest-side, rgba(200, 16, 46, .85), transparent); }
+.navidad .in-aurora i:nth-child(2) { background: radial-gradient(closest-side, rgba(242, 193, 78, .5), transparent); }
+.navidad .in-aurora i:nth-child(3) { background: radial-gradient(closest-side, rgba(30, 138, 80, .6), transparent); }
+.navidad .in-rejilla { background-image: linear-gradient(rgba(255, 227, 161, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 227, 161, .06) 1px, transparent 1px); }
+.navidad .in-siete { -webkit-text-stroke-color: rgba(242, 193, 78, .14); }
+.navidad .in-linea { background: linear-gradient(90deg, transparent, var(--oro-2) 18%, #fff 50%, var(--oro-2) 82%, transparent); box-shadow: 0 0 18px var(--oro), 0 0 46px rgba(242, 193, 78, .55); }
+.navidad .in-costura line { stroke: #FFE9B8; filter: drop-shadow(0 0 6px var(--oro)) drop-shadow(0 0 16px var(--oro)); }
+.navidad .in-logo::before { background: radial-gradient(closest-side, rgba(242, 193, 78, .3), rgba(200, 16, 46, .2) 55%, transparent); }
+.navidad .in-croma, .navidad .in-brillo { -webkit-mask-image: url(../img/logos/navidad/seven-pro-league-hd.webp); mask-image: url(../img/logos/navidad/seven-pro-league-hd.webp); }
+.navidad .in-croma-c { background: var(--oro); }
+.navidad .in-onda { border-color: rgba(255, 227, 161, .85); box-shadow: 0 0 24px rgba(242, 193, 78, .5), inset 0 0 24px rgba(242, 193, 78, .35); }
+.navidad .in-aro::after { background: conic-gradient(from 0deg, transparent 0 58%, rgba(242, 193, 78, .15) 70%, var(--oro) 88%, #fff 91%, transparent 92%); }
+.navidad .in-nombre .g > span { background-image: linear-gradient(100deg, #FFE9B0, var(--oro) 55%, #E39A2D); }
+/* saludo bajo la línea de VAR */
+.navidad .in-centro::after { content: '✦  Feliz Navidad  ✦'; white-space: pre; font-family: var(--tech); font-size: clamp(11px, 2.8vw, 13px); font-weight: 600; letter-spacing: .34em; text-transform: uppercase; color: var(--oro); text-shadow: 0 0 18px rgba(242, 193, 78, .6); opacity: 0; animation: nv-saludo .9s var(--e) 1.9s forwards; }
+@keyframes nv-saludo { from { opacity: 0; transform: translateY(8px); letter-spacing: .6em; } to { opacity: 1; transform: none; } }
+
+/* ───────── nieve (canvas de navidad.js) ───────── */
+.nv-nieve { position: fixed; inset: 0; z-index: 44; width: 100%; height: 100%; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .navidad .nav::before, .nv-esfera { animation: none; }
+  .navidad .in-centro::after { animation: none; opacity: 1; }
+}

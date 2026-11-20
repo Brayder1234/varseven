@@ -34,6 +34,7 @@
   // ───────── partículas de luz ─────────
   const lienzo = $('#in-polvo');
   const polvo = [];
+  const tono = getComputedStyle(intro).getPropertyValue('--in-polvo').trim() || '140,243,250'; // color de las partículas (en Navidad lo cambia navidad.css)
   let cx = null, W = 0, H = 0;
   function medir() {
     if (!lienzo) return;
@@ -48,7 +49,7 @@
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2, v = rafaga ? 2.5 + Math.random() * 6 : .15 + Math.random() * .45;
       const d = rafaga ? 30 + Math.random() * 40 : 40 + Math.random() * Math.max(W, H) * .45;
-      polvo.push({ x: x0 + Math.cos(a) * d, y: y0 + Math.sin(a) * d, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (rafaga ? 0 : .25), r: .6 + Math.random() * (rafaga ? 2.2 : 1.6), a: 0, max: .35 + Math.random() * .6, f: rafaga ? .955 : 1, c: Math.random() < .7 ? '140,243,250' : '255,255,255' });
+      polvo.push({ x: x0 + Math.cos(a) * d, y: y0 + Math.sin(a) * d, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (rafaga ? 0 : .25), r: .6 + Math.random() * (rafaga ? 2.2 : 1.6), a: 0, max: .35 + Math.random() * .6, f: rafaga ? .955 : 1, c: Math.random() < .7 ? tono : '255,255,255' });
     }
   }
   function dibujar() {
