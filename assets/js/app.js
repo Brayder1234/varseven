@@ -69,10 +69,21 @@ SP.cargar = (nombre, alListo) => {
 SP.equipoPorId = t => Object.fromEntries((t.equipos || []).map(e => [e.id, e]));
 SP.jugadorPorId = t => Object.fromEntries((t.equipos || []).flatMap(e => (e.jugadores || []).map(j => [j.id, { ...j, equipo: e.id }])));
 SP.jugados = t => (t.partidos || []).filter(p => p.estado === 'finalizado' && Number.isFinite(+p.gl) && Number.isFinite(+p.gv) && p.gl !== null && p.gv !== null);
+// fase final: cada partido de eliminación lleva fase 'cuartos' | 'semis' | 'final' (se elige por fecha en el panel)
+SP.FASES = { grupos: 'Fase de grupos', cuartos: 'Cuartos de final', semis: 'Semifinal', final: 'Final' };
+SP.esLlave = p => !!p.fase && p.fase !== 'grupos';
+SP.nombreFecha = (t, f) => { const p = (t.partidos || []).find(x => x.fecha === f && SP.esLlave(x)); return p ? SP.FASES[p.fase] : `Fecha ${f}`; };
+// ganador de un partido de eliminación (por goles y, si empatan, por penales); null si aún no hay ganador
+SP.ganador = p => {
+  if (!p || p.estado !== 'finalizado' || p.gl == null || p.gv == null) return null;
+  if (+p.gl !== +p.gv) return +p.gl > +p.gv ? p.local : p.visita;
+  if (p.pl != null && p.pv != null && p.pl !== '' && p.pv !== '' && +p.pl !== +p.pv) return +p.pl > +p.pv ? p.local : p.visita;
+  return null;
+};
 SP.tabla = t => {
   const R = { pg: 3, pe: 1, pp: 0, ...(t.reglas || {}) };
   const T = Object.fromEntries((t.equipos || []).map(e => [e.id, { eq: e, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0, forma: [] }]));
-  for (const p of SP.jugados(t).sort((a, b) => a.fecha - b.fecha)) {
+  for (const p of SP.jugados(t).filter(p => !SP.esLlave(p)).sort((a, b) => a.fecha - b.fecha)) {
     const L = T[p.local], V = T[p.visita];
     if (!L || !V) continue;
     const gl = +p.gl, gv = +p.gv;
@@ -95,13 +106,32 @@ SP.goleadores = t => {
   return Object.entries(c).map(([id, goles]) => ({ jugador: J[id] || { nombre: id }, equipo: E[J[id]?.equipo], goles }))
     .sort((a, b) => b.goles - a.goles || a.jugador.nombre.localeCompare(b.jugador.nombre));
 };
+// llaves: cuartos con la tabla de la fase de grupos (1-8, 4-5 | 3-6, 2-7, como el cuadro del torneo); los ganadores avanzan solos
+SP.llaves = t => {
+  const n = +(t.reglas?.clasifican) || 8, tabla = SP.tabla(t);
+  if (n !== 8 || tabla.length < 8) return null;
+  const sem = tabla.slice(0, 8).map((x, i) => ({ id: x.eq.id, pos: i + 1 }));
+  const llave = (fase, a, b) => {
+    const p = a && b ? (t.partidos || []).find(x => x.fase === fase && ((x.local === a.id && x.visita === b.id) || (x.local === b.id && x.visita === a.id))) : null;
+    const g = SP.ganador(p);
+    return { fase, a, b, p, ganador: g ? (g === a.id ? a : b) : null };
+  };
+  const s = i => sem[i];
+  const q = [llave('cuartos', s(0), s(7)), llave('cuartos', s(3), s(4)), llave('cuartos', s(2), s(5)), llave('cuartos', s(1), s(6))];
+  const sf = [llave('semis', q[0].ganador, q[1].ganador), llave('semis', q[2].ganador, q[3].ganador)];
+  const fin = llave('final', sf[0].ganador, sf[1].ganador);
+  const gruposAbiertos = (t.partidos || []).some(p => !SP.esLlave(p) && p.estado !== 'finalizado');
+  return { cuartos: q, semis: sf, final: fin, campeon: fin.ganador, gruposAbiertos };
+};
 SP.fechas = t => [...new Set((t.partidos || []).map(p => p.fecha))].sort((a, b) => a - b);
 SP.proximaFecha = t => {
   const pend = (t.partidos || []).filter(p => p.estado !== 'finalizado');
   return pend.length ? Math.min(...pend.map(p => p.fecha)) : null;
 };
 SP.descansa = (t, fecha) => {
-  const juegan = new Set((t.partidos || []).filter(p => p.fecha === fecha).flatMap(p => [p.local, p.visita]));
+  const ps = (t.partidos || []).filter(p => p.fecha === fecha);
+  if (ps.some(SP.esLlave)) return []; // en la fase final no "descansa" nadie: los demás ya quedaron eliminados
+  const juegan = new Set(ps.flatMap(p => [p.local, p.visita]));
   return (t.equipos || []).filter(e => !juegan.has(e.id));
 };
 

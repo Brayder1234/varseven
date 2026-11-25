@@ -11,19 +11,20 @@
     const prox = SP.proximaFecha(t), partidos = (t.partidos || []).filter(p => p.fecha === prox).sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
     $('#res-temporada').textContent = `${t.nombre} · ${t.temporada}`;
     const meta = [];
-    if (prox) meta.push(`<span>Fecha ${prox} · ${esc(SP.fecha(partidos[0]?.dia))}</span>`);
+    if (prox) meta.push(`<span>${esc(SP.nombreFecha(t, prox))} · ${esc(SP.fecha(partidos[0]?.dia))}</span>`);
     if (tabla[0]?.pj) meta.push(`<span><img src="${esc(tabla[0].eq.escudo)}" alt="">Líder: ${esc(tabla[0].eq.nombre)}</span>`);
     if (gol) meta.push(`<span>⚽ ${esc(gol.jugador.nombre)} · ${gol.goles}</span>`);
     $('#door-torneo-meta').innerHTML = meta.join('');
 
     const crest = (id, cls = '') => `<img class="crest ${cls}" src="${esc(E[id]?.escudo)}" alt="" loading="lazy">`;
     $('#res-proxima').innerHTML = prox ? `
-      <div class="card-h"><h3 class="display">Fecha ${prox}</h3><small>${esc(SP.fecha(partidos[0]?.dia, { weekday: 'long', day: 'numeric', month: 'long' }))}</small></div>
+      <div class="card-h"><h3 class="display">${esc(SP.nombreFecha(t, prox))}</h3><small>${esc(SP.fecha(partidos[0]?.dia, { weekday: 'long', day: 'numeric', month: 'long' }))}</small></div>
       <div class="vs-list">${partidos.map(p => `<a class="vs" href="torneo.html#partidos">
         <span class="t">${crest(p.local, 'crest-sm')}<span>${esc(E[p.local]?.nombre)}</span></span>
         <span class="mid">${p.estado === 'finalizado' ? `<b>${p.gl} - ${p.gv}</b>` : esc(SP.hora(p.hora) || 'vs')}</span>
         <span class="t v">${crest(p.visita, 'crest-sm')}<span>${esc(E[p.visita]?.nombre)}</span></span></a>`).join('')}</div>
       ${SP.descansa(t, prox).length ? `<p class="descansa">Descansa: ${SP.descansa(t, prox).map(e => esc(e.nombre)).join(', ')}</p>` : ''}`
+      : SP.llaves(t) ? `<div class="card-h"><h3 class="display">Fase final</h3><small>Cuartos de final</small></div><p class="muted">Terminó la fase de grupos: los 8 mejores ya tienen su cruce.</p><a class="link" href="torneo.html#llaves">Ver las llaves ${SP.ICON.arrow}</a>`
       : `<div class="card-h"><h3 class="display">Fase terminada</h3></div><p class="muted">Pronto anunciamos la siguiente etapa.</p>`;
 
     $('#res-tabla').innerHTML = `

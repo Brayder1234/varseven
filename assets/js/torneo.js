@@ -9,7 +9,7 @@
   SP.cargar('torneo', t => {
     if (!t) { $('#ins').innerHTML = '<p class="empty">No pudimos cargar el torneo. Intenta de nuevo en un momento.</p>'; return; }
     T = t; E = SP.equipoPorId(t); J = SP.jugadorPorId(t);
-    hero(); inscripcion(); posiciones(); proximos(); resultados(); goleadores(); sanciones(); galeria(); medios(); promosTorneo();
+    hero(); inscripcion(); llaves(); posiciones(); proximos(); resultados(); goleadores(); sanciones(); galeria(); medios(); promosTorneo();
     SP.revelar();
   });
   SP.cargar('sitio', s => {
@@ -49,7 +49,7 @@
 
   function posiciones() {
     const R = T.reglas || {}, tabla = SP.tabla(T), cl = +R.clasifican || tabla.length;
-    const ult = SP.jugados(T).reduce((m, p) => Math.max(m, p.fecha), 0);
+    const ult = SP.jugados(T).filter(p => !SP.esLlave(p)).reduce((m, p) => Math.max(m, p.fecha), 0);
     $('#pos-fase').textContent = `${T.fase || 'Fase de grupos'}${ult ? ` · después de la fecha ${ult}` : ''}`;
     $('#tabla tbody').innerHTML = tabla.map((x, i) => `<tr class="${i >= cl ? 'fuera' : ''}">
       <td class="pos">${i + 1}</td><td class="eq"><div>${crest(x.eq.id, 'crest-sm')}${esc(x.eq.nombre)}</div></td>
@@ -61,19 +61,78 @@
 
   function tarjeta(p, abrir = true) {
     const fin = p.estado === 'finalizado';
-    const w = fin ? (+p.gl > +p.gv ? 'l' : +p.gl < +p.gv ? 'v' : '') : '';
+    const g = SP.esLlave(p) ? SP.ganador(p) : null;
+    const w = fin ? (g ? (g === p.local ? 'l' : 'v') : +p.gl > +p.gv ? 'l' : +p.gl < +p.gv ? 'v' : '') : '';
     const tag = abrir && fin ? 'button' : 'div';
     return `<${tag} class="partido r" ${tag === 'button' ? `data-id="${esc(p.id)}" aria-label="Ver detalle: ${nombre(p.local)} ${p.gl} - ${p.gv} ${nombre(p.visita)}"` : ''}>
       <span class="eq ${w === 'l' ? 'win' : ''}">${crest(p.local)}<span>${nombre(p.local)}</span></span>
       <span class="marcador">
         <span class="estado ${fin ? 'fin' : ''}">${fin ? 'FINAL' : p.estado === 'aplazado' ? 'APLAZADO' : 'PROGRAMADO'}</span>
-        ${fin ? `<span class="goles">${p.gl} : ${p.gv}</span>` : `<span class="hora">${esc(SP.hora(p.hora) || 'vs')}</span>`}
+        ${fin ? `<span class="goles">${p.gl} : ${p.gv}</span>${pen(p) ? `<span class="pen">${pen(p)}</span>` : ''}` : `<span class="hora">${esc(SP.hora(p.hora) || 'vs')}</span>`}
         <span class="cuando">${esc(SP.fecha(p.dia))}${fin && p.hora ? ' · ' + esc(SP.hora(p.hora)) : ''}${p.cancha ? ' · ' + esc(p.cancha) : ''}</span>
       </span>
       <span class="eq ${w === 'v' ? 'win' : ''}">${crest(p.visita)}<span>${nombre(p.visita)}</span></span>
       ${tag === 'button' ? `<span class="ver">${p.fotos ? 'Goles y fotos' : 'Ver goles'}</span>` : ''}
     </${tag}>`;
   }
+  // penales: solo en eliminación cuando hubo empate
+  const pen = p => SP.esLlave(p) && +p.gl === +p.gv && p.pl != null && p.pv != null && p.pl !== '' && p.pv !== '' ? `Penales ${p.pl} - ${p.pv}` : '';
+
+  // ───────── llaves de la fase final ─────────
+  function llaves() {
+    const L = SP.llaves(T), hay = (T.partidos || []).some(SP.esLlave);
+    const ver = !!L && (!L.gruposAbiertos || hay);
+    $('#llaves').hidden = !ver; $('#sub-llaves').hidden = !ver;
+    if (!ver) return;
+    // dibujo como el cuadro oficial del torneo (1080 × 880): escudos a los lados, nodos donde aparece cada ganador y la copa al centro
+    const X = x => (x / 1080 * 100).toFixed(2) + '%', Y = y => (y / 880 * 100).toFixed(2) + '%';
+    const pos = (x, y) => `left:${X(x)};top:${Y(y)}`;
+    const marcador = m => {
+      const p = m.p;
+      if (!p) return '';
+      if (p.estado !== 'finalizado') return ''; // la fecha y la hora están en Próximos partidos
+      const aL = m.a && p.local === m.a.id, ga = aL ? p.gl : p.gv, gb = aL ? p.gv : p.gl;
+      const pa = aL ? p.pl : p.pv, pb = aL ? p.pv : p.pl;
+      return `${ga} - ${gb}${pen(p) ? `\npen. ${pa}-${pb}` : ''}`;
+    };
+    const equipo = (x, m, cx, cy, sx) => {
+      const est = m.ganador ? (m.ganador.id === x.id ? 'gana' : 'pierde') : '';
+      return `<div class="ll-t ${est}" style="${pos(cx, cy)}" title="${nombre(x.id)}">${crest(x.id)}</div><b class="ll-sd display ${est}" style="${pos(sx, cy)}">${x.pos}</b>`;
+    };
+    const nodo = (m, cx, cy, lado = '') => {
+      const fin = m.p?.estado === 'finalizado', g = m.ganador;
+      const tag = fin ? 'button' : 'div', txt = marcador(m);
+      return `<${tag} class="ll-n${g ? ' listo' : ''}" style="${pos(cx, cy)}" ${fin ? `data-abrir="${esc(m.p.id)}" aria-label="Ver detalle del partido"` : ''}>${g ? crest(g.id) : '<span class="ll-bola"></span>'}${txt ? `<span class="ll-l ${lado}">${esc(txt)}</span>` : ''}</${tag}>`;
+    };
+    const c = L.cuartos, sf = L.semis, F = L.final, campeon = L.campeon;
+    const ronda = campeon ? `Campeón: ${E[campeon.id]?.nombre || ''}` : F.p || (sf[0].ganador && sf[1].ganador) ? 'Gran final' : sf.some(m => m.p) || c.every(m => m.ganador) ? 'Semifinales' : 'Cuartos de final';
+    const LINEAS = 'M262 68H303V150M262 310H303V230M338 190H398V680H338M262 553H303V640M262 797H303V720M398 427H440';
+    $('#bracket').innerHTML = `
+      <div class="ll-tit"><b class="display">Fase final</b><span class="display">${esc(ronda)}</span></div>
+      <div class="ll-cuadro">
+        <svg class="ll-lineas" viewBox="0 0 1080 880" preserveAspectRatio="none" aria-hidden="true"><path d="${LINEAS}"/><path d="${LINEAS}" transform="matrix(-1 0 0 1 1080 0)"/><path d="M504 427H576M540 427V392"/></svg>
+        <img class="ll-copa" src="assets/img/torneo/trofeo.webp" alt="Copa Seven Pro League" style="${pos(540, 180)}">
+        ${campeon ? `<div class="ll-campeon-e" style="${pos(540, 230)}">${crest(campeon.id)}</div><p class="ll-campeon" style="${pos(540, 368)}"><small>Campeón</small> <b class="display">${nombre(campeon.id)}</b></p>` : ''}
+        ${equipo(c[0].a, c[0], 200, 68, 118)}${equipo(c[0].b, c[0], 200, 310, 118)}${nodo(c[0], 303, 190, 'der')}
+        ${equipo(c[1].a, c[1], 200, 553, 118)}${equipo(c[1].b, c[1], 200, 797, 118)}${nodo(c[1], 303, 680, 'der')}
+        ${equipo(c[2].a, c[2], 880, 68, 962)}${equipo(c[2].b, c[2], 880, 310, 962)}${nodo(c[2], 777, 190, 'izq')}
+        ${equipo(c[3].a, c[3], 880, 553, 962)}${equipo(c[3].b, c[3], 880, 797, 962)}${nodo(c[3], 777, 680, 'izq')}
+        ${nodo(sf[0], 472, 427)}${nodo(sf[1], 608, 427)}
+        ${F.p?.estado === 'finalizado' ? `<p class="ll-final" style="${pos(540, 548)}">Final · ${esc(marcador(F))}</p>` : ''}
+        <div class="ll-makro display" style="${pos(540, 618)}"><b>7VS7</b><span>Cancha<br>Makro</span></div>
+        <div class="ll-marca" style="${pos(540, 765)}"><img src="assets/img/logos/seven-pro-league.png" alt=""><span class="display">#El poder <small>del</small><br>fútbol aficionado</span></div>
+      </div>`;
+    // en celular los marcadores no caben en el dibujo: van en una lista corta debajo
+    const lista = [...c, ...sf, F].filter(m => m.p && m.a && m.b).map(m => {
+      const p = m.p, fin = p.estado === 'finalizado';
+      const lado = x => `<span class="${m.ganador ? (m.ganador.id === x.id ? 'gana' : 'pierde') : ''}">${crest(x.id, 'crest-sm')}${nombre(x.id)}</span>`;
+      const centro = fin ? esc(marcador(m)) : esc([SP.fecha(p.dia, { day: 'numeric', month: 'short' }), SP.hora(p.hora)].filter(x => x && x !== 'Por definir').join(' · ') || 'vs');
+      return `<${fin ? `button data-abrir="${esc(p.id)}"` : 'div'} class="ll-fila"><small>${SP.FASES[m.fase]}</small>${lado(m.a)}<b>${centro}</b>${lado(m.b)}</${fin ? 'button' : 'div'}>`;
+    }).join('');
+    $('#bracket').insertAdjacentHTML('beforeend', lista ? `<div class="ll-lista">${lista}</div>` : '');
+    $('#ll-nota').textContent = L.gruposAbiertos ? 'Así quedarían los cruces si la fase de grupos terminara hoy.' : 'Los cruces salen de la tabla final y cada ganador avanza solo con su resultado. Toca un partido jugado para ver los goles.';
+  }
+
   const centrar = (barra, el, suave) => {
     if (!barra || !el) return;
     const x = el.offsetLeft - (barra.clientWidth - el.offsetWidth) / 2;
@@ -86,7 +145,7 @@
     if (!f) { $('#proximos').innerHTML = '<p class="empty">No hay partidos programados por ahora.</p>'; $('#prox-sub').textContent = 'Calendario'; return; }
     const ps = T.partidos.filter(p => p.fecha === f && p.estado !== 'finalizado').sort(ordenHora);
     const d = SP.descansa(T, f);
-    $('#prox-sub').textContent = `Fecha ${f} · ${SP.fecha(ps[0]?.dia, { weekday: 'long', day: 'numeric', month: 'long' })}`;
+    $('#prox-sub').textContent = `${SP.nombreFecha(T, f)} · ${SP.fecha(ps[0]?.dia, { weekday: 'long', day: 'numeric', month: 'long' })}`;
     $('#proximos').innerHTML = `<div class="partidos">${ps.map(p => tarjeta(p, false)).join('')}</div>
       ${d.length ? `<p class="descanso">Descansa: <b>${d.map(e => esc(e.nombre)).join(', ')}</b></p>` : ''}`;
   }
@@ -95,7 +154,7 @@
     const fechas = SP.fechas(T);
     const jugadas = new Set(SP.jugados(T).map(p => p.fecha));
     if (fechaSel === null || !fechas.includes(fechaSel)) fechaSel = Math.max(...[...jugadas], fechas[0] || 1);
-    $('#fecha-chips').innerHTML = fechas.map(f => `<button aria-pressed="${f === fechaSel}" class="${jugadas.has(f) ? '' : 'pend'}" data-f="${f}">Fecha ${f}</button>`).join('');
+    $('#fecha-chips').innerHTML = fechas.map(f => `<button aria-pressed="${f === fechaSel}" class="${jugadas.has(f) ? '' : 'pend'}" data-f="${f}">${esc(SP.nombreFecha(T, f))}</button>`).join('');
     const ps = T.partidos.filter(p => p.fecha === fechaSel).sort(ordenHora);
     const fin = ps.filter(p => p.estado === 'finalizado'), goles = fin.reduce((s, p) => s + (+p.gl) + (+p.gv), 0);
     $('#fecha-stats').innerHTML = [[fin.length, 'Juegos'], [fin.filter(p => +p.gl === +p.gv).length, 'Empates'], [goles, 'Goles'], [fin.length ? (goles / fin.length).toFixed(1) : '0', 'Promedio']]
@@ -111,8 +170,8 @@
   // detalle de partido: goles por equipo
   const md = $('#md');
   document.addEventListener('click', e => {
-    const b = e.target.closest('button.partido[data-id]');
-    if (b) abrirPartido(b.dataset.id);
+    const b = e.target.closest('button.partido[data-id], [data-abrir]');
+    if (b) abrirPartido(b.dataset.id || b.dataset.abrir);
     if (e.target.closest('#md [data-close]')) cerrarPartido();
   });
   function abrirPartido(id) {
@@ -130,7 +189,7 @@
     $('#md-panel').innerHTML = `<button class="icon-btn md-close" data-close aria-label="Cerrar">${ICON.close}</button>
       <div class="md-head">
         <div class="eq">${crest(p.local, 'crest-lg')}<span>${nombre(p.local)}</span></div>
-        <div><div class="res">${p.gl} : ${p.gv}</div><small>Fecha ${p.fecha} · ${esc(SP.fecha(p.dia))}${p.hora ? ' · ' + esc(SP.hora(p.hora)) : ''}</small></div>
+        <div><div class="res">${p.gl} : ${p.gv}</div>${pen(p) ? `<small class="pen">${pen(p)}</small>` : ''}<small>${esc(SP.nombreFecha(T, p.fecha))} · ${esc(SP.fecha(p.dia))}${p.hora ? ' · ' + esc(SP.hora(p.hora)) : ''}</small></div>
         <div class="eq">${crest(p.visita, 'crest-lg')}<span>${nombre(p.visita)}</span></div>
       </div>
       <div class="md-body">

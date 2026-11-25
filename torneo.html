@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://sevenpro-api.sarmientobrayder10.workers.dev" crossorigin>
 <link rel="stylesheet" href="assets/css/app.css?v=20261027c">
-<link rel="stylesheet" href="assets/css/torneo.css?v=20261027c">
+<link rel="stylesheet" href="assets/css/torneo.css?v=20261124a">
 <script>document.documentElement.classList.replace('no-js', 'js')</script>
 <link rel="stylesheet" href="assets/css/navidad.css?v=20261120a">
 <!-- temporada de Navidad: solo cambia el estilo; se quita sola el 7 de enero (?navidad=0 la apaga, ?navidad=1 la fuerza) -->
@@ -38,7 +38,7 @@
   </section>
 
   <div class="subnav"><div class="wrap"><nav id="subnav" aria-label="Secciones del torneo">
-    <a href="#inscripcion">Inscripción</a><a href="#posiciones">Posiciones</a><a href="#partidos">Próximos</a><a href="#resultados">Resultados</a><a href="#goleadores">Goleadores</a><a href="#sanciones">Sanciones</a><a href="#fotos">Jugadores</a><a href="#medios">Fotos y videos</a><a href="#redes">Redes</a>
+    <a href="#inscripcion">Inscripción</a><a href="#llaves" id="sub-llaves" hidden>Llaves</a><a href="#posiciones">Posiciones</a><a href="#partidos">Próximos</a><a href="#resultados">Resultados</a><a href="#goleadores">Goleadores</a><a href="#sanciones">Sanciones</a><a href="#fotos">Jugadores</a><a href="#medios">Fotos y videos</a><a href="#redes">Redes</a>
   </nav></div></div>
 
   <!-- partido en vivo (panel → En vivo) -->
@@ -47,6 +47,14 @@
   <!-- inscripción: apartado propio, separado de las estadísticas -->
   <section class="sec" id="inscripcion">
     <div class="wrap"><div id="ins"><div class="sk" style="height:460px"></div></div></div>
+  </section>
+
+  <!-- fase final: llaves que avanzan solas con los resultados (panel → Resultados, fecha marcada como Cuartos / Semifinal / Final) -->
+  <section class="sec" id="llaves" hidden>
+    <div class="wrap">
+      <div class="llaves r" id="bracket"></div>
+      <p class="ll-nota" id="ll-nota"></p>
+    </div>
   </section>
 
   <section class="sec sec-light cut-top" id="posiciones">
@@ -130,7 +138,7 @@
   <button class="icon-btn lb-prev" data-lb="-1" aria-label="Anterior"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
   <button class="icon-btn lb-next" data-lb="1" aria-label="Siguiente"><svg class="i" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
 </div>
-<script src="assets/js/app.js?v=20261027c"></script>
-<script src="assets/js/torneo.js?v=20261027c"></script>
+<script src="assets/js/app.js?v=20261124a"></script>
+<script src="assets/js/torneo.js?v=20261124a"></script>
 </body>
 </html>
