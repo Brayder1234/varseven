@@ -130,6 +130,7 @@
       return `<${fin ? `button data-abrir="${esc(p.id)}"` : 'div'} class="ll-fila"><small>${SP.FASES[m.fase]}</small>${lado(m.a)}<b>${centro}</b>${lado(m.b)}</${fin ? 'button' : 'div'}>`;
     }).join('');
     $('#bracket').insertAdjacentHTML('beforeend', lista ? `<div class="ll-lista">${lista}</div>` : '');
+    $$('#bracket img[loading="lazy"]').forEach(i => { i.loading = 'eager'; }); // los escudos de abajo a veces no cargaban
     $('#ll-nota').textContent = L.gruposAbiertos ? 'Así quedarían los cruces si la fase de grupos terminara hoy.' : 'Los cruces salen de la tabla final y cada ganador avanza solo con su resultado. Toca un partido jugado para ver los goles.';
   }
 
