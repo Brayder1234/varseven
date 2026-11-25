@@ -370,3 +370,11 @@ h1, h2, h3, h4, p { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* tienda oculta desde el panel (Tienda → Mostrar u ocultar): solo queda el torneo */
+html.sin-tienda :is(.links, #menu nav) a:is([data-k="tienda"], [data-k="guia"]),
+html.sin-tienda :is(#bag-btn, #bag, #toast, .foot-tienda, #door-tienda, .split-vs, .ribbon, #canchas, #oferta, .of-pop, #ins-promo, #mvp-promo) { display: none !important; }
+html.sin-tienda .door-torneo { clip-path: none; margin-right: 0; }
+html.sin-tienda .door-torneo:hover { flex-grow: 1; }
+html.sin-tienda .foot-grid { grid-template-columns: 1.6fr 1fr 1.2fr; }
+@media (max-width: 1080px) { html.sin-tienda .foot-grid { grid-template-columns: 1fr 1fr; } }

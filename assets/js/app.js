@@ -166,6 +166,7 @@ SP.ofertaHoy = () => {
 // anuncio de la oferta de lanzamiento: 'pronto' antes de empezar, 'activa' durante, null cuando ya terminó o está apagada
 SP.lanzamiento = () => {
   const l = SP.promos().lanzamiento, h = SP.fechaHoy();
+  if (!SP.tiendaVisible()) return null;
   if (!l.activo || !(+l.porcentaje > 0) || (l.hasta && h > l.hasta)) return null;
   const dia = iso => new Date(iso + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
   return { l, pct: +l.porcentaje, fase: l.desde && h < l.desde ? 'pronto' : 'activa', desde: l.desde ? dia(l.desde) : '', hasta: l.hasta ? dia(l.hasta) : '', finDia: l.hasta ? new Date(l.hasta + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long' }) : '',
@@ -216,6 +217,16 @@ SP.lock = () => { if (locks++) return; lockY = scrollY; document.body.style.top 
 SP.unlock = () => { if (--locks > 0) return; locks = 0; document.body.classList.remove('lock', 'modal-open'); document.body.style.top = ''; scrollTo({ top: lockY, behavior: 'instant' }); };
 
 // ───────── estructura común: barra de avisos, cabecera, menú, pie, bolsa ─────────
+// tienda visible u oculta (panel → Tienda → Mostrar u ocultar); se aplica con lo guardado antes de pintar para que no parpadee
+SP.tiendaVisible = () => (SP.sitio || SP.store.get('sp:sitio', null))?.tienda?.visible !== false;
+SP.aplicarTienda = () => {
+  const oculta = !SP.tiendaVisible();
+  document.documentElement.classList.toggle('sin-tienda', oculta);
+  if (oculta && ['tienda', 'guia'].includes(document.body.dataset.page)) { location.replace('index.html'); return; }
+  let n = 0;
+  document.querySelectorAll('#menu nav a').forEach(a => { if (getComputedStyle(a).display !== 'none') a.querySelector('small').textContent = '0' + ++n; });
+};
+document.documentElement.classList.toggle('sin-tienda', !SP.tiendaVisible());
 const PAGINAS = [['inicio', 'index.html', 'Inicio'], ['torneo', 'torneo.html', 'Torneo'], ['tienda', 'tienda.html', 'Tienda'], ['guia', 'guia.html', 'Guía'], ['patro', 'index.html#patrocinadores', 'Patrocinadores']];
 const pagina = document.body.dataset.page;
 document.body.insertAdjacentHTML('afterbegin', `
@@ -227,7 +238,7 @@ document.body.insertAdjacentHTML('afterbegin', `
         <img src="assets/img/logos/seven-pro-league.png" alt="" width="46" height="46"><span class="x">×</span><img class="var" src="assets/img/logos/var-seven-pro-shop.webp" alt="">
         <span class="brand-t"><b>Seven Pro</b><small>League · Shop</small></span>
       </a>
-      <nav class="links" aria-label="Secciones">${PAGINAS.map(([k, h, t]) => `<a href="${h}"${k === pagina ? ' aria-current="page"' : ''}>${t}</a>`).join('')}</nav>
+      <nav class="links" aria-label="Secciones">${PAGINAS.map(([k, h, t]) => `<a href="${h}" data-k="${k}"${k === pagina ? ' aria-current="page"' : ''}>${t}</a>`).join('')}</nav>
       <div class="nav-act">
         <button class="icon-btn" id="bag-btn" aria-label="Abrir la bolsa">${SP.ICON.bag}<span class="bag-n" id="bag-n">0</span></button>
         <button class="icon-btn menu-btn" id="menu-btn" aria-label="Abrir el menú" aria-expanded="false"><span></span></button>
@@ -235,7 +246,7 @@ document.body.insertAdjacentHTML('afterbegin', `
     </div>
   </header>
   <div class="menu" id="menu">
-    <nav aria-label="Menú">${PAGINAS.map(([k, h, t], i) => `<a class="display" href="${h}" style="--i:${i}">${t}<small>0${i + 1}</small></a>`).join('')}</nav>
+    <nav aria-label="Menú">${PAGINAS.map(([k, h, t], i) => `<a class="display" href="${h}" data-k="${k}" style="--i:${i}">${t}<small>0${i + 1}</small></a>`).join('')}</nav>
     <a class="btn btn-wa btn-block" data-wa-general href="#" target="_blank" rel="noopener">${SP.ICON.wa.replace('<svg', '<svg width="20" height="20" fill="currentColor"')} Escríbenos</a>
   </div>`);
 document.body.insertAdjacentHTML('beforeend', `
@@ -248,7 +259,7 @@ document.body.insertAdjacentHTML('beforeend', `
           <p>Seven Pro League y Seven Pro Shop × VAR: el torneo de fútbol 7 de Barranquilla y la tienda que lo equipa.</p>
         </div>
         <div><h4>Torneo</h4><ul><li><a href="torneo.html#posiciones">Posiciones</a></li><li><a href="torneo.html#resultados">Resultados</a></li><li><a href="torneo.html#goleadores">Goleadores</a></li><li><a href="torneo.html#inscripcion">Inscripciones</a></li></ul></div>
-        <div><h4>Tienda</h4><ul><li><a href="tienda.html?cat=guayos">Guayos</a></li><li><a href="tienda.html?cat=torretin">Torretín</a></li><li><a href="tienda.html?cat=futsal">Futsal</a></li><li><a href="guia.html">Guía de tallas</a></li></ul></div>
+        <div class="foot-tienda"><h4>Tienda</h4><ul><li><a href="tienda.html?cat=guayos">Guayos</a></li><li><a href="tienda.html?cat=torretin">Torretín</a></li><li><a href="tienda.html?cat=futsal">Futsal</a></li><li><a href="guia.html">Guía de tallas</a></li></ul></div>
         <div><h4>Síguenos</h4><ul id="foot-redes"></ul></div>
       </div>
       <div class="foot-b">
@@ -299,6 +310,7 @@ SP.alSitio = [];
 SP.cargar('sitio', s => {
   if (!s) return;
   SP.sitio = s;
+  SP.aplicarTienda();
   for (const c of s.categorias || []) SP.CATS[c.id] = { nombre: c.nombre, code: c.codigo || '', sup: c.superficie || '' };
   const lz = SP.lanzamiento();
   const av = [...(lz ? [`🔥 −${lz.pct}% en toda la tienda${lz.desde && lz.hasta ? ` · del ${lz.desde} al ${lz.hasta}` : ''}`] : []), ...(s.avisos || []).filter(Boolean)];
